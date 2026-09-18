@@ -75,13 +75,23 @@
 
 /* ============================ Buttons ============================ */
 
+/* Every button is a flex row with a real gap between icon and label. Without
+   this the ghost variant collapsed its icon into the text ("≡Menu"). */
 .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
   border: 1px solid transparent;
   border-radius: var(--r-pill);
   cursor: pointer;
   font-weight: 700;
   white-space: nowrap;
   transition: transform 0.09s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn svg {
+  flex: none;
 }
 
 .btn:active {
@@ -99,8 +109,6 @@
   font-size: 17px;
   padding: 15px 34px;
   box-shadow: var(--sh-btn);
-  display: inline-flex;
-  align-items: center;
   gap: 11px;
 }
 
@@ -834,6 +842,16 @@
   display: flex;
   justify-content: flex-end;
   margin-bottom: 10px;
+}
+
+/* Provenance and the re-check belong together, at the foot of the evidence. */
+.section-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
 }
 
 /* ============================ Stat strip ============================ */

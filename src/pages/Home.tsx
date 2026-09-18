@@ -25,6 +25,7 @@ import {
   IconCheck,
   IconCopy,
   IconExternal,
+  IconRefresh,
   IconSend,
   IconUser,
   IconWallet,
@@ -349,11 +350,6 @@ export function Home({
               summary={loading ? "checking…" : `${paidCount} of ${contributors.length} · from Stellar`}
               defaultOpen
             >
-              <div className="section-actions">
-                <button type="button" className="btn btn-ghost btn-sm" onClick={refresh}>
-                  {loading ? "Checking…" : "Re-check"}
-                </button>
-              </div>
               <div className="members">
                 {statuses.map((status) => (
                   <div
@@ -402,10 +398,16 @@ export function Home({
                   </div>
                 ))}
               </div>
-              <div className="tiny muted" style={{ marginTop: 12 }}>
-                {checkedAt
-                  ? `Last chain check ${fmtDate(checkedAt)}. Status is derived from Horizon, not from a database we control.`
-                  : "Waiting for the first chain check…"}
+              <div className="section-foot">
+                <span className="tiny muted">
+                  {checkedAt
+                    ? `Last chain check ${fmtDate(checkedAt)} · read from Horizon, not from our database`
+                    : "Waiting for the first chain check…"}
+                </span>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={refresh}>
+                  <IconRefresh size={15} />
+                  {loading ? "Checking…" : "Re-check"}
+                </button>
               </div>
             </Disclosure>
 
