@@ -186,8 +186,9 @@ export default function App() {
             </div>
             <SignInPanel />
             <p className="tiny muted" style={{ marginBottom: 0 }}>
-              No seed phrase, no browser extension and no gas: Pollar creates a Stellar wallet
-              for you and covers the network fee.
+              No seed phrase and no browser extension: Pollar creates a Stellar wallet for you
+              and sponsors the wallet itself. Stellar's network fee still comes from your own
+              XLM — about a hundredth of a cent per payment.
             </p>
           </div>
         </div>

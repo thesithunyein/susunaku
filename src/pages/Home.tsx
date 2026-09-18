@@ -158,6 +158,11 @@ export function Home({
   const iAmContributor = Boolean(me && !iAmRecipient);
   const collectedNow = paidCount * circle.amountUsdc;
   const finished = isComplete(circle, now);
+  // A Stellar payment's fee comes out of the sender's own XLM, so a wallet
+  // holding none cannot submit at all — the SDK refuses client-side. Better to
+  // say so before the click than to surface "Not enough XLM" afterwards.
+  const xlmValue = pollar.xlmBalance === null ? null : Number(pollar.xlmBalance);
+  const lowGas = xlmValue !== null && Number.isFinite(xlmValue) && xlmValue < 0.0001;
 
   const runPay = async () => {
     if (!recipient?.address) return;
@@ -235,6 +240,17 @@ export function Home({
           <span className="marker" />
         </div>
 
+        {lowGas && iAmContributor ? (
+          <div
+            className="note note-warn"
+            style={{ maxWidth: 560, margin: "14px auto 0", textAlign: "left" }}
+          >
+            This wallet holds no XLM. Stellar takes a payment's fee from the sender's own
+            balance — Pollar sponsors the wallet and its trustlines, not that fee — so this
+            contribution would be refused before it is submitted. Add a little XLM (a few cents
+            covers thousands of payments) and try again.
+          </div>
+        ) : null}
         {payMessage ? (
           <div
             className={`note ${payMessage.kind === "ok" ? "note-good" : "note-bad"}`}

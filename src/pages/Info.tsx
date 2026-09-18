@@ -21,7 +21,7 @@ export function HowItWorks() {
           },
           {
             title: "2 · Settle",
-            body: "USDC on Stellar settles in about five seconds for a fraction of a cent. Pollar sponsors the network fee, so contributing costs nothing extra.",
+            body: "USDC on Stellar settles in about five seconds. Stellar's fee is a hundredth of a cent, paid in XLM from your own wallet — Pollar sponsors the wallet and its trustlines, not that fee.",
           },
           {
             title: "3 · Verify",

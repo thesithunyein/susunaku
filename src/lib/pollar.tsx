@@ -24,9 +24,14 @@ import {
  * Thin, typed wrapper over @pollar/core.
  *
  * Pollar gives every user a non-custodial wallet behind a social or email
- * login, and pays the network fees, which is what makes a savings circle usable
- * by someone who has never touched crypto. We only consume it: auth, the
- * wallet address, the balance, and payment submission.
+ * login, and sponsors the wallet and its trustlines, which is what makes a
+ * savings circle usable by someone who has never touched crypto. We only
+ * consume it: auth, the wallet address, the balances, and payment submission.
+ *
+ * One thing Pollar does NOT cover: the fee of a Stellar payment. That comes out
+ * of the sending account's own XLM, and the SDK refuses to build the
+ * transaction without it — hence `readNativeBalance`, so the UI can say so
+ * before the click instead of after.
  */
 
 export type PollarStatus =
@@ -52,6 +57,11 @@ interface PollarContextValue {
   address: string | null;
   email: string | null;
   balanceUsdc: string | null;
+  /**
+   * Native XLM, in human units. null while unknown. A Stellar payment's fee is
+   * paid from this, so a zero here means a contribution cannot be submitted.
+   */
+  xlmBalance: string | null;
   /** null while unknown (signed out, or the asset list hasn't loaded yet). */
   usdcTrustline: boolean | null;
   /** Whether this app has USDC enabled at all. null while unknown. */
@@ -98,6 +108,37 @@ function readBalance(client: PollarClient, issuer: string): string | null {
     data?: { balances?: unknown };
   };
   return pickUsdc(state?.data?.balances, issuer);
+}
+
+/**
+ * Native balance, in human units.
+ *
+ * Stellar takes a payment's fee from the sending account's own XLM. Pollar
+ * sponsors the wallet, its reserves and its trustlines, so a fresh member has a
+ * working USDC wallet holding exactly zero XLM — and the SDK then refuses the
+ * payment client-side with "Not enough XLM to cover the network fee", before
+ * anything reaches the ledger. Reading this lets the UI explain that instead.
+ */
+function readNativeBalance(client: PollarClient): string | null {
+  const state = client.getWalletBalanceState() as unknown as {
+    step?: string;
+    data?: { balances?: unknown };
+  };
+  const balances = state?.data?.balances;
+  if (!Array.isArray(balances)) return null;
+  for (const entry of balances) {
+    if (!entry || typeof entry !== "object") continue;
+    const record = entry as Record<string, unknown>;
+    const code = String(record.assetCode ?? record.code ?? record.asset_code ?? "").toUpperCase();
+    const kind = String(
+      record.assetType ?? record.asset_type ?? record.type ?? ""
+    ).toLowerCase();
+    if (kind !== "native" && code !== "XLM") continue;
+    const amount = record.balance ?? record.available ?? record.amount;
+    if (amount === null || amount === undefined) continue;
+    return String(amount);
+  }
+  return null;
 }
 
 interface UsdcAssetInfo {
@@ -149,6 +190,7 @@ export function PollarGateway({ children }: { children: ReactNode }) {
   const [address, setAddress] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [balanceUsdc, setBalanceUsdc] = useState<string | null>(null);
+  const [xlmBalance, setXlmBalance] = useState<string | null>(null);
   const [usdcTrustline, setUsdcTrustline] = useState<boolean | null>(null);
   const [usdcEnabledInApp, setUsdcEnabledInApp] = useState<boolean | null>(null);
   const [txPending, setTxPending] = useState(false);
@@ -191,8 +233,14 @@ export function PollarGateway({ children }: { children: ReactNode }) {
       }
       void client
         .refreshBalance()
-        .then(() => setBalanceUsdc(readBalance(client, USDC_ISSUER_ACTIVE)))
-        .catch(() => setBalanceUsdc(null));
+        .then(() => {
+          setBalanceUsdc(readBalance(client, USDC_ISSUER_ACTIVE));
+          setXlmBalance(readNativeBalance(client));
+        })
+        .catch(() => {
+          setBalanceUsdc(null);
+          setXlmBalance(null);
+        });
       void client
         .refreshAssets()
         .catch(() => undefined)
@@ -221,6 +269,7 @@ export function PollarGateway({ children }: { children: ReactNode }) {
         setAddress(null);
         setEmail(null);
         setBalanceUsdc(null);
+        setXlmBalance(null);
         setUsdcTrustline(null);
         setUsdcEnabledInApp(null);
         return;
@@ -234,7 +283,10 @@ export function PollarGateway({ children }: { children: ReactNode }) {
       if (state.step === "success" && addressRef.current) {
         void client
           .refreshBalance()
-          .then(() => setBalanceUsdc(readBalance(client, USDC_ISSUER_ACTIVE)))
+          .then(() => {
+            setBalanceUsdc(readBalance(client, USDC_ISSUER_ACTIVE));
+            setXlmBalance(readNativeBalance(client));
+          })
           .catch(() => undefined);
       }
     });
@@ -340,8 +392,14 @@ export function PollarGateway({ children }: { children: ReactNode }) {
     if (!client) return;
     void client
       .refreshBalance()
-      .then(() => setBalanceUsdc(readBalance(client, USDC_ISSUER_ACTIVE)))
-      .catch(() => setBalanceUsdc(null));
+      .then(() => {
+        setBalanceUsdc(readBalance(client, USDC_ISSUER_ACTIVE));
+        setXlmBalance(readNativeBalance(client));
+      })
+      .catch(() => {
+        setBalanceUsdc(null);
+        setXlmBalance(null);
+      });
   }, [client]);
 
   /**
@@ -457,6 +515,7 @@ export function PollarGateway({ children }: { children: ReactNode }) {
     address,
     email,
     balanceUsdc,
+    xlmBalance,
     usdcTrustline,
     usdcEnabledInApp,
     txPending,

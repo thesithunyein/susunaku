@@ -283,7 +283,7 @@ export function SignInPanel() {
           />
           <span className="hint">
             No seed phrase and no extension: Pollar creates a Stellar wallet for you and
-            sponsors the network fee.
+            sponsors the wallet itself. Stellar's own fee comes from your XLM.
           </span>
         </div>
         <button type="submit" className="btn btn-ghost btn-block">
