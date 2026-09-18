@@ -31,6 +31,7 @@ import {
   IconWallet,
 } from "../components/icons";
 import { CIRCLE_NAMES } from "../data/names";
+import HeroToy from "../components/HeroToy";
 
 function useNow(intervalMs = 1000): number {
   const [now, setNow] = useState(() => Date.now());
@@ -179,6 +180,8 @@ export function Home({
           </div>
         </section>
 
+        <HeroToy />
+
         {/* An account is empty. The page is not: with no data to show, it shows
             the product — three steps and what actually changes. */}
         <div className="wrap">
@@ -208,6 +211,8 @@ export function Home({
             </a>
           </div>
         </section>
+
+        <HeroToy />
 
         <div className="wrap">
           <div className="stack" style={{ marginTop: 30 }}>

@@ -279,6 +279,38 @@
   gap: 0;
 }
 
+/* ============================ Mascot ============================ */
+
+/* The empty page's resident: a big lavender character whose recorded pupils
+   follow the cursor (HeroToy scrubs the frame). Its background is the same
+   #f0eefa as the canvas, so it sits in the page with no frame around it. */
+.toy-stage {
+  position: relative;
+  z-index: 1;
+  margin: clamp(6px, 2vh, 22px) -28px 0;
+  width: calc(100% + 56px);
+  height: clamp(300px, 42vw, 600px);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.toy-stage video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+@media (max-width: 700px) {
+  .toy-stage {
+    margin-top: 4px;
+    height: clamp(240px, 68vw, 340px);
+  }
+}
+
 /* ============================ Cards ============================ */
 
 /* A card is a block of the page, not a box: no background, no border, no shadow.
