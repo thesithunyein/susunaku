@@ -13,10 +13,15 @@ check rather than a claim in a notebook.
 
 [**Live app**](https://susunaku.sithunyein.com) · [How it works](https://susunaku.sithunyein.com/#/how) · [Pollar SDK docs](https://docs.pollar.xyz) · [Source](https://github.com/thesithunyein/susunaku) · [Explorer](https://stellar.expert/explorer/testnet)
 
+[![Live](https://img.shields.io/badge/live-susunaku.sithunyein.com-2FA84F?style=flat-square&labelColor=0B0B0C)](https://susunaku.sithunyein.com)
 ![Network](https://img.shields.io/badge/Stellar-testnet-4A54E1?style=flat-square&labelColor=0B0B0C)
 ![Settlement](https://img.shields.io/badge/settles-USDC-2FA84F?style=flat-square&labelColor=0B0B0C)
 ![Custody](https://img.shields.io/badge/custody-none-E5432C?style=flat-square&labelColor=0B0B0C)
 ![Built on Pollar](https://img.shields.io/badge/built%20on-Pollar-D9A520?style=flat-square&labelColor=0B0B0C)
+[![License: MIT](https://img.shields.io/badge/license-MIT-0B0B0C?style=flat-square&labelColor=0B0B0C)](./LICENSE)
+[![Contributing](https://img.shields.io/badge/PRs-welcome-4A54E1?style=flat-square&labelColor=0B0B0C)](./CONTRIBUTING.md)
+[![Security](https://img.shields.io/badge/security-policy-E5432C?style=flat-square&labelColor=0B0B0C)](./SECURITY.md)
+[![Conduct](https://img.shields.io/badge/code%20of-conduct-55555F?style=flat-square&labelColor=0B0B0C)](./CODE_OF_CONDUCT.md)
 
 The name blends two names for the same institution: *susu* (West Africa) and
 *pasanaku* (the Andes).
@@ -162,8 +167,24 @@ Static hosts that read a `CNAME` file (GitHub Pages, Cloudflare Pages) already h
 
 ## Architecture
 
+```mermaid
+flowchart TB
+    Member[Member · email code, no seed phrase] --> App[Susunaku app]
+    App --> Pollar[Pollar SDK · @pollar/core]
+    Pollar --> Wallet[Non-custodial wallet · sponsored reserve + USDC trustline]
+    App --> Pay["runTx(payment) · N−1 direct USDC transfers"]
+    Pay --> Chain[Stellar ledger]
+    Chain --> Horizon[Horizon API]
+    Horizon --> Status[useRoundStatus · who has paid, from the chain]
+    App --> Link[Invite link · the whole circle travels in the URL]
+    App --> Corridor[Corridor panel · ramps in and out]
+    Status --> Receipts[Explorer receipts · one tx hash per contribution]
 ```
-src/
+
+Nothing in that diagram is a server we run: the app is a static bundle, the wallet is the
+member's own, the record is the ledger, and the directory is the link itself.
+
+### Source map
   lib/
     config.ts          network, USDC issuers, Horizon + explorer URLs, key storage
     circle.ts          circle model, cadences, round maths, velocity maths
@@ -244,3 +265,20 @@ npm run pollar:check # probe the SDK endpoints this app depends on
 
 `verify:leg` exits non-zero unless a matching payment exists *and* the recipient's balance
 reconciles, so it is usable in CI as well as by hand.
+
+## Contributing
+
+Pull requests are welcome — see [CONTRIBUTING.md](./CONTRIBUTING.md) for the setup and the
+rules of the road. By participating you agree to the [Code of Conduct](./CODE_OF_CONDUCT.md).
+
+## Security
+
+Found something? Do not open a public issue — see [SECURITY.md](./SECURITY.md). The short
+version: this app never holds keys, so the highest-severity class of bug lives in the SDK and
+the ledger rather than here; report anything that looks like custody, key handling, or a way to
+fake a `paid` state as high priority.
+
+## License
+
+[MIT](./LICENSE) — free to fork, run and remix. The mascot is the project's identity; if you
+fork the code, drawing your own character is the polite thing to do.

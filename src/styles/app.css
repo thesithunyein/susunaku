@@ -54,17 +54,11 @@
   letter-spacing: -0.035em;
 }
 
-/* The coin travels the ring; the counter-rotation keeps its face upright. */
-.susu-orbit {
+/* The mascot's pupils blink, and both eyes glance side to side together. */
+.susu-glance {
   transform-box: view-box;
-  transform-origin: 32px 32px;
-  animation: logo-orbit 7.5s linear infinite;
-}
-
-.susu-coin {
-  transform-box: view-box;
-  transform-origin: 32px 12px;
-  animation: logo-counter 7.5s linear infinite;
+  transform-origin: 32px 29.5px;
+  animation: logo-glance 7.5s ease-in-out infinite;
 }
 
 .susu-eye {
@@ -73,15 +67,17 @@
   animation: logo-blink 5.6s infinite;
 }
 
-@keyframes logo-orbit {
-  to {
-    transform: rotate(360deg);
+@keyframes logo-glance {
+  0%,
+  28% {
+    transform: translateX(-2.6px);
   }
-}
-
-@keyframes logo-counter {
-  to {
-    transform: rotate(-360deg);
+  50%,
+  78% {
+    transform: translateX(2.6px);
+  }
+  100% {
+    transform: translateX(-2.6px);
   }
 }
 

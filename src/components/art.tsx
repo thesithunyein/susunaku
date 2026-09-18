@@ -1,15 +1,14 @@
 /**
- * The Susunaku mark: three members and one coin.
+ * The Susunaku mark: the mascot himself.
  *
- * Three fat rounded bars lie on a ring, with a gold coin travelling around them.
- * The middle is deliberately empty — that is the product. The coin orbits and its
- * face stays upright (a counter-rotation), and the eye blinks now and then so the
- * mark reads as alive rather than as a spinner. Both are CSS-only, so
- * `prefers-reduced-motion` stops them like any other animation.
+ * The big lavender boy from the landing page, redrawn flat: a fuzzy dome rising
+ * from the bottom edge (exactly how he appears in the app), two wide eyes whose
+ * pupils glance about, ochre brows, and the pink heart he holds — the pot that
+ * does not exist, carried by nobody in particular.
  *
- * Ring geometry: r = 20, so the circumference is 125.6637. A dash of 32.5 and a
- * gap of 93.1637 is exactly one revolution, and stepping the offset by 41.8879
- * (120°) places the three members.
+ * One CSS animation pair, both stopped by the global `prefers-reduced-motion`
+ * rule: the pupils blink (`.susu-eye`) and glance side to side (`.susu-glance`).
+ * Palette: body #C7B4F2, heart #F2A0C4, brows/coin ochre #E8A34B, ink #080909.
  */
 export function Mark({ size = 30, animated = true }: { size?: number; animated?: boolean }) {
   return (
@@ -20,61 +19,54 @@ export function Mark({ size = 30, animated = true }: { size?: number; animated?:
       aria-hidden="true"
       className={animated ? "susu-logo" : undefined}
     >
-      <defs>
-        <linearGradient id="susuCoinFace" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#FFD978" />
-          <stop offset="100%" stopColor="#D9A520" />
-        </linearGradient>
-      </defs>
+      {/* body: a dome sitting on the bottom edge, no legs — he rises, like in the video */}
+      <path
+        d="M32 7 C18.5 7 8.5 21 8.5 39.5 L8.5 62 Q8.5 64 10.5 64 L53.5 64 Q55.5 64 55.5 62 L55.5 39.5 C55.5 21 45.5 7 32 7 Z"
+        fill="#C7B4F2"
+        stroke="#080909"
+        strokeWidth="2.6"
+      />
+      {/* brows: ochre, round-capped, slightly worried */}
+      <path
+        d="M14.5 18.5 Q20 13.5 25.5 16 M38.5 16 Q44 13.5 49.5 18.5"
+        fill="none"
+        stroke="#E8A34B"
+        strokeWidth="4.4"
+        strokeLinecap="round"
+      />
 
-      {[
-        { color: "#4A54E1", offset: 0 },
-        { color: "#D9A520", offset: -41.8879 },
-        { color: "#2FA84F", offset: -83.7758 },
-      ].map((member) => (
-        <g key={member.offset} fill="none" strokeLinecap="round">
-          <circle
-            cx="32"
-            cy="32"
-            r="20"
-            stroke="#080909"
-            strokeWidth="11"
-            strokeDasharray="32.5 93.1637"
-            strokeDashoffset={member.offset}
-          />
-          <circle
-            cx="32"
-            cy="32"
-            r="20"
-            stroke={member.color}
-            strokeWidth="6.4"
-            strokeDasharray="32.5 93.1637"
-            strokeDashoffset={member.offset}
-          />
-        </g>
-      ))}
-
-      <g className="susu-orbit">
-        <g className="susu-coin">
-          <circle
-            cx="32"
-            cy="12"
-            r="9"
-            fill="url(#susuCoinFace)"
-            stroke="#080909"
-            strokeWidth="2.8"
-          />
-          <circle className="susu-eye" cx="29.3" cy="10.4" r="1.7" fill="#080909" />
-          <circle className="susu-eye" cx="34.7" cy="10.4" r="1.7" fill="#080909" />
-          <path
-            d="M28.8 13.9 Q32 17.1 35.2 13.9"
-            fill="none"
-            stroke="#080909"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-          />
+      {/* eyes: wide white, ink-rimmed, pupils glancing up-left then about */}
+      <g className={animated ? "susu-glance" : undefined}>
+        <circle cx="22.5" cy="28" r="8" fill="#FFFFFF" stroke="#080909" strokeWidth="2.4" />
+        <circle cx="41.5" cy="28" r="8" fill="#FFFFFF" stroke="#080909" strokeWidth="2.4" />
+        <g className={animated ? "susu-eye" : undefined}>
+          <circle cx="21" cy="26.5" r="4.3" fill="#080909" />
+          <circle cx="40" cy="26.5" r="4.3" fill="#080909" />
+          <circle cx="22.7" cy="24.8" r="1.3" fill="#FFFFFF" />
+          <circle cx="41.7" cy="24.8" r="1.3" fill="#FFFFFF" />
         </g>
       </g>
+
+      {/* the heart he hugs: the pot that does not exist. Big, at his chest,
+          with his arms wrapped around it — hands landing on its edges. */}
+      <path
+        d="M32 60.5 C23.5 55 21 48.5 25 44.8 C27.8 42.2 32 44 32 46.8 C32 44 36.2 42.2 39 44.8 C43 48.5 40.5 55 32 60.5 Z"
+        fill="#F2A0C4"
+        stroke="#080909"
+        strokeWidth="2.4"
+        strokeLinejoin="round"
+      />
+      {/* arms: thick lavender strokes with ink rims, from the body's sides,
+          hands (the round caps) resting on the heart */}
+      {[
+        { d: "M12.5 36 Q13 51 25.5 53.5" },
+        { d: "M51.5 36 Q51 51 38.5 53.5" },
+      ].map((arm) => (
+        <g key={arm.d} fill="none" strokeLinecap="round">
+          <path d={arm.d} stroke="#080909" strokeWidth="8.4" />
+          <path d={arm.d} stroke="#C7B4F2" strokeWidth="4.4" />
+        </g>
+      ))}
     </svg>
   );
 }
