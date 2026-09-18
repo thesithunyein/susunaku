@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "pollar:check": "node scripts/check-pollar.mjs",
-    "member:new": "node scripts/make-usdc-member.mjs"
+    "member:new": "node scripts/make-usdc-member.mjs",
+    "verify:leg": "node scripts/verify-leg.mjs"
   },
   "dependencies": {
     "@pollar/core": "^0.11.0",
