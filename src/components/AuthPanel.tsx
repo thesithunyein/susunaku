@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePollar } from "../lib/pollar";
 import { shortAddr } from "../lib/format";
 import { NETWORK, USDC_ISSUER_ACTIVE } from "../lib/config";
@@ -103,6 +103,24 @@ export function SignInPanel() {
   const [mail, setMail] = useState("");
   const [code, setCode] = useState("");
   const [trustMsg, setTrustMsg] = useState<string | null>(null);
+  const [mailError, setMailError] = useState<string | null>(null);
+  /** Guards against sending the code twice for the same `entering_email` step. */
+  const autoSentRef = useRef(false);
+
+  // The SDK tells us when it is ready for the address: `beginEmailLogin()` lands in
+  // `entering_email`, and only then does `sendEmailCode` have a session to send on.
+  // Waiting for that state beats guessing with a timer.
+  useEffect(() => {
+    if (status !== "authenticating") {
+      autoSentRef.current = false;
+      return;
+    }
+    if (authStep !== "entering_email") return;
+    if (autoSentRef.current) return;
+    if (!mail.includes("@")) return;
+    autoSentRef.current = true;
+    sendEmailCode(mail.trim());
+  }, [status, authStep, mail, sendEmailCode]);
 
   if (status === "ready" && address) {
     return (
@@ -164,6 +182,42 @@ export function SignInPanel() {
           {STEP_COPY[authStep] ?? "Working…"} Follow the prompt if a window opened.
         </div>
 
+        {authStep === "entering_email" || authStep === "sending_email" ? (
+          <form
+            className="stack"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!mail.includes("@")) {
+                setMailError("That does not look like an email address.");
+                return;
+              }
+              setMailError(null);
+              sendEmailCode(mail.trim());
+            }}
+          >
+            <div className="field">
+              <label htmlFor="email-retry">Email</label>
+              <input
+                id="email-retry"
+                type="email"
+                value={mail}
+                onChange={(event) => setMail(event.target.value)}
+                placeholder="you@example.com"
+                autoComplete="email"
+              />
+              <span className="hint">
+                {authStep === "sending_email"
+                  ? "Sending… if nothing arrives in a minute, send it again."
+                  : "We will email you a six-digit code."}
+              </span>
+            </div>
+            {mailError ? <div className="note note-bad">{mailError}</div> : null}
+            <button type="submit" className="btn btn-primary btn-block">
+              Send my code
+            </button>
+          </form>
+        ) : null}
+
         {authStep === "entering_code" ? (
           <form
             className="stack"
@@ -198,6 +252,7 @@ export function SignInPanel() {
   return (
     <div className="stack">
       {authMessage ? <div className="note note-bad">{authMessage}</div> : null}
+      {mailError ? <div className="note note-bad">{mailError}</div> : null}
       <button type="button" className="btn btn-primary btn-block" onClick={loginGoogle}>
         🔵 Continue with Google
       </button>
@@ -206,9 +261,14 @@ export function SignInPanel() {
         className="stack"
         onSubmit={(event) => {
           event.preventDefault();
-          if (!mail.includes("@")) return;
+          if (!mail.includes("@")) {
+            setMailError("That does not look like an email address.");
+            return;
+          }
+          setMailError(null);
+          // Hands off to the `entering_email` step, which sends the code once the
+          // SDK says its session is ready.
           beginEmail();
-          window.setTimeout(() => sendEmailCode(mail.trim()), 150);
         }}
       >
         <div className="field">
