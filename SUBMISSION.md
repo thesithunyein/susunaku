@@ -1,8 +1,9 @@
 # Susunaku — a savings circle with no pot to steal
 
 **Live:** https://susunaku.sithunyein.com · **Code:** https://github.com/thesithunyein/susunaku
+**Demo video:** https://youtu.be/l380nz3cRFg (90-second walkthrough: the round, the ledger receipt, the pay flow, the verify script)
 **Built on:** Pollar SDK (`@pollar/core` v0.11.3) · Stellar · USDC (Circle testnet)
-**Verified payment:** [`396c6095…bbccbde3`](https://stellar.expert/explorer/testnet/tx/396c6095613fa1f04b695560dee4537bd2df19dc39293eef8939883cbbccbde3) · ledger 4738198 · `payment` · 1.0000000 USDC
+**Verified payments:** [`396c6095…bbccbde3`](https://stellar.expert/explorer/testnet/tx/396c6095613fa1f04b695560dee4537bd2df19dc39293eef8939883cbbccbde3) · ledger 4738198 · `payment` · 1.0000000 USDC — recorded in this document's evidence section. A second and third live payment ([`116cfa09…eeba9ab`](https://stellar.expert/explorer/testnet/tx/116cfa097b6470f63114d642c9af99e526911b85842eb6570f037393aeeba9ab), [`2999d51d…721f0099`](https://stellar.expert/explorer/testnet/tx/2999d51d09d48c0dd4758e0a5f39ad0a9f10d2dc5933a3388e3838ec721f0099) — sent while testing and recording the demo) also reconcile on the ledger; the evidence section below documents the first in full.
 
 ---
 
