@@ -380,14 +380,26 @@ export function PollarGateway({ children }: { children: ReactNode }) {
       return { ok: true };
     }
 
-    const outcome = await client.setTrustline({
-      code: "USDC",
-      issuer: USDC_ISSUER_ACTIVE,
-    });
+    // Pollar may have created the trustline during login, in which case the read
+    // above was simply early. Re-read from the chain-of-truth before asking the
+    // server to create something that already exists — a redundant request can
+    // throw, and an exception here would block a perfectly good payment.
+    let outcome: { status: string; details?: string } | null = null;
+    try {
+      outcome = await client.setTrustline({
+        code: "USDC",
+        issuer: USDC_ISSUER_ACTIVE,
+      });
+    } catch (err) {
+      outcome = {
+        status: "error",
+        details: err instanceof Error ? err.message : "Could not reach Pollar.",
+      };
+    }
     try {
       await client.refreshAssets();
     } catch {
-      /* fall through — we report what the refreshed state says */
+      /* fall through — the read below is what we report on */
     }
     const established = Boolean(readUsdcAsset(client)?.trustlineEstablished);
     setUsdcTrustline(established);
@@ -396,10 +408,7 @@ export function PollarGateway({ children }: { children: ReactNode }) {
     }
     return {
       ok: false,
-      message:
-        outcome.status === "error"
-          ? outcome.details ?? "Could not establish the USDC trustline."
-          : "Could not establish the USDC trustline.",
+      message: outcome.details ?? "Could not establish the USDC trustline.",
     };
   }, [client]);
 
