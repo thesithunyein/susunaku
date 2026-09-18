@@ -186,34 +186,79 @@ member's own, the record is the ledger, and the directory is the link itself.
 
 ### Source map
 
+Every file in the repository, what it does, and its size. No hidden directories, no "and some
+glue": the app is small enough to read in an afternoon, on purpose.
+
 ```
-src/
-  lib/
-    config.ts          network, USDC issuers, Horizon + explorer URLs, key storage
-    circle.ts          circle model, cadences, round maths, velocity maths
-    stellar.ts         Horizon lookups; matches a contribution to a round
-    pollar.tsx         React gateway over @pollar/core (auth, wallet, balance, ramps, payments)
-    corridor.ts        the Africa → Latin America corridor, live legs vs designed legs
-    useRoundStatus.ts  who has paid this round, derived from the chain
-    share.ts           circles encoded into invite links (no server registry)
-    store.ts           local circle store
-  components/
-    chrome.tsx         top bar, menu, footer
-    art.tsx            the logo mark and lockup
-    icons.tsx          inline SVG icon set (including the official Google and GitHub marks)
-    Disclosure.tsx     collapsed sections — the answer first, the explanation on request
-    AuthPanel.tsx      sign-in and the wallet card
-    CorridorPanel.tsx  money in, money out
-  pages/               Home (the round), CreateCircle, JoinCircle, Info
-public/
-  mark.svg             the mark on its own
-  logo.svg             horizontal lockup
-scripts/
-  make-usdc-member.mjs  mint a funded testnet member with a USDC trustline
-  fund-gas.mjs          send XLM so a wallet can pay Stellar fees
-  verify-leg.mjs        read a payment leg off Horizon and reconcile both balances
-  check-pollar.mjs      probe the SDK endpoints the app depends on
+susunaku/
+├─ index.html                 25   shell, meta/OG tags, favicon, theme colour
+├─ vite.config.ts             14   Vite + React plugin, dev-server allow-list
+├─ tsconfig.json              20   strict TypeScript, bundler resolution
+├─ vercel.json                 8    SPA rewrites for the hash router
+├─ package.json               30    scripts; deps: react, @pollar/core, stellar-sdk
+├─ .env.example                8    VITE_POLLAR_PUBLISHABLE_KEY, VITE_STELLAR_NETWORK
+│
+├─ src/
+│  ├─ main.tsx               19   root: PollarGateway → LangProvider → App
+│  ├─ App.tsx               222   hash router, top bar, menu, countdown pill, auth sheet
+│  ├─ gaze-frames.json       72   70-row calibration: gaze angle → video frame time
+│  ├─ data/
+│  │  └─ names.ts            31   18 regional names for the same institution
+│  ├─ lib/
+│  │  ├─ pollar.tsx         718   the @pollar/core gateway: auth, wallet, balance, ramps, pay
+│  │  ├─ i18n.tsx           206   en/es/pt dictionary, context, persistence, detection
+│  │  ├─ corridor.ts        154   Africa ⇄ LatAm legs: live vs designed, honestly labelled
+│  │  ├─ circle.ts          145   the model: cadences, round maths, rotation, velocity
+│  │  ├─ stellar.ts         145   Horizon lookups; matches a payment to its round window
+│  │  ├─ useRoundStatus.ts  112   who has paid, derived from the chain — never stored
+│  │  ├─ store.ts            74   local circle store (localStorage + invite links)
+│  │  ├─ config.ts           71   network, USDC issuers, Horizon + explorer URLs
+│  │  ├─ format.ts           58   countdowns, amounts, addresses
+│  │  └─ share.ts            47   the whole circle encoded into one URL
+│  ├─ components/
+│  │  ├─ AuthPanel.tsx      318   sign-in, email-code flow, wallet card
+│  │  ├─ CorridorPanel.tsx  314   money in / money out, from the SDK's own ramp list
+│  │  ├─ icons.tsx          264   inline SVG set incl. official Google + GitHub marks
+│  │  ├─ chrome.tsx         170   top bar, menu, footer, language switcher
+│  │  ├─ HeroToy.tsx        142   the mascot: cursor-scrub video, mobile loop
+│  │  ├─ art.tsx             81   the mascot as static mark + lockup
+│  │  └─ Disclosure.tsx      46   collapsed sections — answer first, detail on request
+│  ├─ pages/
+│  │  ├─ Home.tsx           628   the round: stats, who-has-paid, receipts, invite, pay
+│  │  ├─ CreateCircle.tsx   336   amount, cadence, members, rotation order
+│  │  ├─ Info.tsx           172   How it works + Network & key
+│  │  └─ JoinCircle.tsx      52   arriving from an invite link
+│  └─ styles/
+│     ├─ app.css          1287   the flat editorial system, every component
+│     └─ tokens.css         116   colour, type, radius, spacing variables
+│
+├─ public/
+│  ├─ favicon.svg            12   the mascot on the cream tile
+│  ├─ mark.svg               25   the mascot, standalone
+│  ├─ logo.svg               29   horizontal lockup with wordmark
+│  ├─ toy-scrub.mp4         4.2MB 169-frame all-intra encode, seekable per frame
+│  ├─ fonts/                       Epilogue-Black.woff2, DMSans-Variable.woff2 (self-hosted)
+│  └─ CNAME                        susunaku.sithunyein.com
+│
+├─ scripts/
+│  ├─ check-pollar.mjs      181   probe the SDK endpoints the app depends on
+│  ├─ verify-leg.mjs        162   read a payment off Horizon, reconcile both balances
+│  ├─ fund-gas.mjs           79   send XLM so a wallet can pay network fees
+│  ├─ make-testnet-account.mjs 76  funded keypair via Friendbot
+│  └─ make-usdc-member.mjs   73   funded member with the USDC trustline open
+│
+└─ docs (repo root)
+   ├─ README.md             287   this file
+   ├─ SUBMISSION.md         177   the four judge questions, evidence, verify steps
+   ├─ SECURITY.md            43   threat model for a keyless static app
+   ├─ CONTRIBUTING.md        53   the two architecture rules, how to build, test, PR
+   ├─ CODE_OF_CONDUCT.md     32   short, project-specific
+   └─ LICENSE                      MIT
 ```
+
+The two biggest files tell the whole story: `pollar.tsx` (718 lines) is the entire bank — every
+privileged interaction the app has with money, in one auditable place — and `app.css`
+(1,287 lines) is the entire look. Everything else is smaller than its name.
 
 Design decisions worth knowing:
 
