@@ -1,4 +1,5 @@
 import { AuthCard, KeyForm } from "../components/AuthPanel";
+import { Disclosure } from "../components/Disclosure";
 import { CIRCLE_NAMES } from "../data/names";
 import { FAUCETS, NETWORK, USDC_ISSUER_ACTIVE } from "../lib/config";
 import { usePollar } from "../lib/pollar";
@@ -37,7 +38,10 @@ export function HowItWorks() {
         ))}
       </div>
 
-      <h2 className="section-title">Why the old model breaks</h2>
+      <Disclosure
+        title="Why the old model breaks"
+        summary="one trusted organiser is also one single point of failure"
+      >
       <div className="grid-2">
         <div className="card">
           <p className="muted" style={{ fontSize: 14, lineHeight: 1.75, marginTop: 0 }}>
@@ -69,6 +73,7 @@ export function HowItWorks() {
           </p>
         </div>
       </div>
+      </Disclosure>
 
       <h2 className="section-title">What is real today, and what is not</h2>
       <div className="grid-2">
@@ -77,7 +82,7 @@ export function HowItWorks() {
             <span className="card-title">Working now</span>
           </div>
           <ul className="tiny muted" style={{ paddingLeft: 18, margin: 0, lineHeight: 1.8 }}>
-            <li>Non-custodial wallets created behind a Google or email login, via Pollar</li>
+            <li>Non-custodial wallets created behind an email login, via Pollar</li>
             <li>Real USDC contributions, signed by each member's own wallet</li>
             <li>Round confirmation read from Horizon, with explorer receipts</li>
             <li>Circles shared entirely by link, with no server-side registry</li>
@@ -95,8 +100,10 @@ export function HowItWorks() {
               Collateral and pre-funded rounds are the next step.
             </li>
             <li>
-              Cash-out to local currency runs through Pollar's ramps (Bolivia, Brazil, Argentina,
-              Mexico today). Mobile money in Africa is the corridor we want next.
+              Cash-out to local currency runs through Pollar's ramps (Bolivia, Brazil, Colombia and
+              Mexico today — every corridor Pollar can execute is Latin American). Mobile money
+              across Africa is the leg we want next, and the one that decides whether a circle with
+              members in Ghana and Nairobi is usable or merely demonstrable.
             </li>
             <li>No offline or USSD entry point yet — smartphone required for now.</li>
           </ul>
@@ -140,7 +147,7 @@ export function Setup() {
           </div>
           {NETWORK === "testnet" ? (
             <div className="note note-warn" style={{ marginTop: 12 }}>
-              On testnet, fund a wallet before contributing:{" "}
+              On testnet, a wallet needs a little XLM for the network fee before it can contribute:{" "}
               <a className="link" href={FAUCETS.xlm} target="_blank" rel="noreferrer">
                 Friendbot
               </a>{" "}
@@ -148,9 +155,10 @@ export function Setup() {
               <a className="link" href={FAUCETS.usdc} target="_blank" rel="noreferrer">
                 Circle faucet
               </a>{" "}
-              for test USDC. Mainnet is a one-line build change
-              <code> (VITE_STELLAR_NETWORK=mainnet)</code> plus a <code>pub_mainnet_</code> key —
-              and it needs your own identity verified with Pollar first.
+              for test USDC. Pollar sponsors the wallet and its trustlines; the operator can also
+              sponsor payment fees (Dashboard → Treasury → Sponsorship) and give new wallets a
+              starting XLM balance (Account Funding). Going to mainnet means a separate Pollar app,
+              a <code>pub_mainnet_</code> key and funded funding + gas wallets.
             </div>
           ) : (
             <div className="note note-bad" style={{ marginTop: 12 }}>

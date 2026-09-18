@@ -244,9 +244,15 @@ export function CreateCircle() {
                   placeholder="G…"
                   spellCheck={false}
                 />
-                <span className="hint">
-                  {member.address && isStellarAddress(member.address)
-                    ? `Looks valid · ${shortAddr(normalizeAddress(member.address), 6)}`
+                <span
+                  className={
+                    member.address && !isStellarAddress(member.address) ? "hint hint-bad" : "hint"
+                  }
+                >
+                  {member.address
+                    ? isStellarAddress(member.address)
+                      ? `Looks valid · ${shortAddr(normalizeAddress(member.address), 6)}`
+                      : "A Stellar address is 56 characters and starts with G."
                     : "Export it from their Pollar wallet."}
                 </span>
               </div>

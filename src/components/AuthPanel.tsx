@@ -300,8 +300,7 @@ export function SignInPanel() {
             autoComplete="email"
           />
           <span className="hint">
-            No seed phrase and no extension: Pollar creates a Stellar wallet for you and
-            sponsors the wallet itself. Stellar's own fee comes from your XLM.
+            We email a six-digit code — there is no password to create and nothing to write down.
           </span>
         </div>
         <button type="submit" className="btn btn-ghost btn-block">

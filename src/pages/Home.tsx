@@ -237,10 +237,9 @@ export function Home({
       className="btn btn-primary"
       onClick={runPay}
       disabled={paying || pollar.txPending || finished}
-    >
-      {paying || pollar.txPending ? <span className="spin" /> : <IconSend size={18} />}
-      Pay my contribution — {fmtUsdcDisplay(circle.amountUsdc)} USDC
-    </button>
+    >            {paying || pollar.txPending ? <span className="spin" /> : <IconSend size={18} />}
+            Pay my contribution — {fmtUsdcDisplay(circle.amountUsdc)} USDC
+          </button>
   ) : iAmRecipient ? (
     <span className="btn btn-primary" style={{ cursor: "default", opacity: 0.92 }}>
       <IconCheck size={18} /> You receive this round
@@ -273,6 +272,7 @@ export function Home({
         {lowGas && iAmContributor ? (
           <div
             className="note note-warn"
+            role="status"
             style={{ maxWidth: 560, margin: "14px auto 0", textAlign: "left" }}
           >
             This wallet holds no XLM. Stellar takes a payment's fee from the sender's own balance —
@@ -281,9 +281,13 @@ export function Home({
             payments) and try again.
           </div>
         ) : null}
+        {/* A payment that succeeds or fails has to be announced, not just
+            coloured: a screen-reader user gets no other signal. */}
         {payMessage ? (
           <div
             className={`note ${payMessage.kind === "ok" ? "note-good" : "note-bad"}`}
+            role={payMessage.kind === "ok" ? "status" : "alert"}
+            aria-live={payMessage.kind === "ok" ? "polite" : "assertive"}
             style={{ maxWidth: 560, margin: "14px auto 0", textAlign: "left" }}
           >
             {payMessage.text}
