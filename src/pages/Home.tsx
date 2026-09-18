@@ -32,6 +32,7 @@ import {
 } from "../components/icons";
 import { CIRCLE_NAMES } from "../data/names";
 import HeroToy from "../components/HeroToy";
+import { useLang } from "../lib/i18n";
 
 function useNow(intervalMs = 1000): number {
   const [now, setNow] = useState(() => Date.now());
@@ -62,16 +63,17 @@ function NameStrip() {
  * against the circle everyone already knows. Short strings and a table, not prose.
  */
 function ProductIntro() {
+  const { t } = useLang();
   const steps: Array<[string, string, string]> = [
-    ["01", "Contribute", "Every member except the recipient pays them, wallet to wallet."],
-    ["02", "Settle", "USDC on Stellar — seconds, for a hundredth of a cent."],
-    ["03", "Verify", "Each payment is a public transaction anyone can open."],
+    ["01", t("step.contribute"), t("step.contributeBody")],
+    ["02", t("step.settle"), t("step.settleBody")],
+    ["03", t("step.verify"), t("step.verifyBody")],
   ];
   const changes: Array<[string, string, string]> = [
-    ["Who holds the money", "The organiser", "Nobody"],
-    ["The record", "A notebook", "The chain"],
-    ["A member abroad", "Locked out", "In the circle"],
-    ["If the organiser leaves", "Savings gone", "Nothing to take"],
+    [t("row.holds"), t("row.holds.old"), t("row.holds.new")],
+    [t("row.record"), t("row.record.old"), t("row.record.new")],
+    [t("row.abroad"), t("row.abroad.old"), t("row.abroad.new")],
+    [t("row.leaves"), t("row.leaves.old"), t("row.leaves.new")],
   ];
 
   return (
@@ -90,13 +92,13 @@ function ProductIntro() {
 
       <div className="card">
         <div className="card-head">
-          <span className="card-title">What changes</span>
+          <span className="card-title">{t("table.title")}</span>
         </div>
         <div className="compare">
           <div className="compare-row compare-head">
             <span />
-            <span>Traditional circle</span>
-            <span>On Susunaku</span>
+            <span>{t("table.traditional")}</span>
+            <span>{t("table.onsusunaku")}</span>
           </div>
           {changes.map(([label, before, after]) => (
             <div className="compare-row" key={label}>
@@ -110,7 +112,7 @@ function ProductIntro() {
 
       <div className="card">
         <div className="card-head">
-          <span className="card-title">Same institution, two continents</span>
+          <span className="card-title">{t("chips.title")}</span>
         </div>
         <NameStrip />
       </div>
@@ -160,6 +162,7 @@ export function Home({
   // signed out is an empty product — no placeholder stats, no account panels
   // for an account nobody has.
   const fromInvite = Boolean(circleId);
+  const { t } = useLang();
 
   if (!pollar.address && !fromInvite) {
     return (
@@ -169,17 +172,15 @@ export function Home({
             peeking over the fold. */}
         <div className="empty-first">
           <section className="hero hero-empty">
-            <div className="kicker">Savings circles on Stellar</div>
-            <h1 className="display display-sm">No circles yet</h1>
-            <p className="hero-sub">
-              Members pay each other directly in USDC, so there is no pot and nobody holding it.
-            </p>
+            <div className="kicker">{t("hero.kicker")}</div>
+            <h1 className="display display-sm">{t("hero.emptyTitle")}</h1>
+            <p className="hero-sub">{t("hero.emptySub")}</p>
             <div className="cta-row">
               <button type="button" className="btn btn-primary" onClick={openAuth}>
-                <IconUser size={18} /> Sign in
+                <IconUser size={18} /> {t("action.signIn")}
               </button>
               <a className="btn btn-ghost" href="#/how">
-                How it works
+                {t("action.how")}
               </a>
             </div>
           </section>
@@ -203,17 +204,15 @@ export function Home({
       <>
         <div className="empty-first">
           <section className="hero hero-empty">
-            <div className="kicker">No circle on this device</div>
-            <h1 className="display display-sm">No circles yet</h1>
-            <p className="hero-sub">
-              Start one and it opens here — amount, cadence, members, rotation order.
-            </p>
+            <div className="kicker">{t("hero.startKicker")}</div>
+            <h1 className="display display-sm">{t("hero.emptyTitle")}</h1>
+            <p className="hero-sub">{t("hero.emptySub2")}</p>
             <div className="cta-row">
               <a className="btn btn-primary" href="#/new">
-                <IconPlus size={18} /> Start a circle
+                <IconPlus size={18} /> {t("action.start")}
               </a>
               <a className="btn btn-ghost" href="#/how">
-                How it works
+                {t("action.how")}
               </a>
             </div>
           </section>

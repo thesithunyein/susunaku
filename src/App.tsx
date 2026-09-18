@@ -11,6 +11,7 @@ import { NETWORK } from "./lib/config";
 import { fmtCountdown, shortAddr } from "./lib/format";
 import { usePollar } from "./lib/pollar";
 import { useCircles } from "./lib/store";
+import { useLang, LANG_OPTIONS } from "./lib/i18n";
 
 type Route =
   | { name: "home"; circleId?: string }
@@ -46,6 +47,7 @@ export default function App() {
   const route = useRoute();
   const circles = useCircles();
   const pollar = usePollar();
+  const { t, lang, setLang } = useLang();
   const [authOpen, setAuthOpen] = useState(false);
   const [now, setNow] = useState(() => Date.now());
 
@@ -53,6 +55,11 @@ export default function App() {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
   }, []);
+
+  // The tab title carries the pitch; it follows the language like everything else.
+  useEffect(() => {
+    document.title = `Susunaku — ${t("tagline.suffix")}`;
+  }, [t]);
 
   const openAuth = useCallback(() => setAuthOpen(true), []);
 
@@ -96,19 +103,19 @@ export default function App() {
   const menu: MenuItem[] = [
     {
       id: "new",
-      label: "New circle",
+      label: t("action.new"),
       icon: <IconPlus size={16} />,
       onClick: () => (window.location.hash = "#/new"),
     },
     {
       id: "how",
-      label: "How it works",
+      label: t("action.how"),
       icon: <IconBook size={16} />,
       onClick: () => (window.location.hash = "#/how"),
     },
     {
       id: "setup",
-      label: "Network & key",
+      label: t("footer.setup"),
       icon: <IconKey size={16} />,
       onClick: () => (window.location.hash = "#/setup"),
     },
@@ -116,7 +123,7 @@ export default function App() {
   if (pollar.hasKey) {
     menu.push({
       id: "balance",
-      label: "Refresh balance",
+      label: t("action.refreshBalance"),
       icon: <IconRefresh size={16} />,
       onClick: () => pollar.refreshBalance(),
     });
@@ -124,7 +131,7 @@ export default function App() {
   if (pollar.address) {
     menu.push({
       id: "signout",
-      label: "Sign out",
+      label: t("action.signOut"),
       icon: <IconUser size={16} />,
       danger: true,
       onClick: () => pollar.signOut(),
@@ -142,6 +149,18 @@ export default function App() {
                 <span className="cd-label">Stellar</span>{" "}
                 <strong>{NETWORK === "mainnet" ? "mainnet" : "testnet"}</strong>
               </span>
+              <select
+                className="lang lang-chip"
+                value={lang}
+                onChange={(e) => setLang(e.target.value as typeof LANG_OPTIONS[number]["value"])}
+                aria-label="Language"
+              >
+                {LANG_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
               <button
                 type="button"
                 className="btn btn-ghost btn-sm account-btn"

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Lockup } from "./art";
 import { GitHubMark, IconExternal, IconMenu } from "./icons";
+import { useLang, LANG_OPTIONS } from "../lib/i18n";
 
 export function TopBar({ pill, right }: { pill?: ReactNode; right?: ReactNode }) {
   return (
@@ -110,21 +111,29 @@ export function TopBarMenu({ items }: { items: MenuItem[] }) {
 }
 
 export function Footer() {
+  const { t, lang, setLang } = useLang();
   return (
     <footer className="footer">
       <span>© 2026 Susunaku</span>
       <span className="sep" />
-      <select className="lang" defaultValue="en" aria-label="Language">
-        <option value="en">English</option>
-        <option value="es">Español</option>
-        <option value="pt">Português</option>
+      <select
+        className="lang"
+        value={lang}
+        onChange={(e) => setLang(e.target.value as typeof LANG_OPTIONS[number]["value"])}
+        aria-label="Language"
+      >
+        {LANG_OPTIONS.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
       </select>
       <span className="footer-links">
         <button type="button" onClick={() => (window.location.hash = "#/how")}>
-          How it works
+          {t("footer.how")}
         </button>
         <button type="button" onClick={() => (window.location.hash = "#/setup")}>
-          Network &amp; key
+          {t("footer.setup")}
         </button>
         <a
           href="https://stellar.expert/explorer/testnet"

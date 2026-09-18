@@ -4,8 +4,10 @@ import { CIRCLE_NAMES } from "../data/names";
 import { FAUCETS, NETWORK, USDC_ISSUER_ACTIVE } from "../lib/config";
 import { usePollar } from "../lib/pollar";
 import { shortAddr } from "../lib/format";
+import { useLang } from "../lib/i18n";
 
 export function HowItWorks() {
+  const { t } = useLang();
   return (
     <div className="wrap" style={{ maxWidth: 900 }}>
       <h1 className="display display-sm">No pot to steal</h1>
@@ -14,16 +16,16 @@ export function HowItWorks() {
       <div className="grid-3">
         {[
           {
-            title: "1 · Contribute",
-            body: "Each round, members pay the recipient directly.",
+            title: `1 · ${t("step.contribute")}`,
+            body: t("step.contributeBody"),
           },
           {
-            title: "2 · Settle",
-            body: "USDC lands in about five seconds, for a hundredth of a cent.",
+            title: `2 · ${t("step.settle")}`,
+            body: t("step.settleBody"),
           },
           {
-            title: "3 · Verify",
-            body: "Every payment is on-chain and public.",
+            title: `3 · ${t("step.verify")}`,
+            body: t("step.verifyBody"),
           },
         ].map((item) => (
           <div className="card" key={item.title}>
@@ -53,7 +55,7 @@ export function HowItWorks() {
         </div>
         <div className="card">
           <div className="card-head">
-            <span className="card-title">Same institution, two continents</span>
+            <span className="card-title">{t("chips.title")}</span>
           </div>
           <div className="name-strip">
             {CIRCLE_NAMES.map((entry) => (
@@ -69,11 +71,11 @@ export function HowItWorks() {
       </div>
       </Disclosure>
 
-      <h2 className="section-title">What is real today, and what is not</h2>
+      <h2 className="section-title">{t("real.title")}</h2>
       <div className="grid-2">
         <div className="card">
           <div className="card-head">
-            <span className="card-title">Working now</span>
+            <span className="card-title">{t("real.working")}</span>
           </div>
           <ul className="tiny muted" style={{ paddingLeft: 18, margin: 0, lineHeight: 1.8 }}>
             <li>Wallets created behind an email login — no keys to manage</li>
@@ -84,7 +86,7 @@ export function HowItWorks() {
         </div>
         <div className="card">
           <div className="card-head">
-            <span className="card-title">Honest gaps</span>
+            <span className="card-title">{t("real.gaps")}</span>
           </div>
           <ul className="tiny muted" style={{ paddingLeft: 18, margin: 0, lineHeight: 1.8 }}>
             <li>
