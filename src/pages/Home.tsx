@@ -54,6 +54,70 @@ function NameStrip() {
   );
 }
 
+/**
+ * The product, for a page that has no account data to show.
+ *
+ * A visitor with no session has nothing to look at, and a blank canvas is a worse
+ * first impression than a short answer: three steps, then what actually changes
+ * against the circle everyone already knows. Short strings and a table, not prose.
+ */
+function ProductIntro() {
+  const steps: Array<[string, string, string]> = [
+    ["01", "Contribute", "Every member except the recipient pays them, wallet to wallet."],
+    ["02", "Settle", "USDC on Stellar — seconds, for a hundredth of a cent."],
+    ["03", "Verify", "Each payment is a public transaction anyone can open."],
+  ];
+  const changes: Array<[string, string, string]> = [
+    ["Who holds the money", "The organiser", "Nobody"],
+    ["The record", "A notebook", "The chain"],
+    ["A member abroad", "Locked out", "In the circle"],
+    ["If the organiser leaves", "Savings gone", "Nothing to take"],
+  ];
+
+  return (
+    <>
+      <div className="grid-3">
+        {steps.map(([n, title, body]) => (
+          <div className="card" key={n}>
+            <div className="step-n">{n}</div>
+            <div className="card-title">{title}</div>
+            <p className="tiny muted" style={{ marginBottom: 0 }}>
+              {body}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div className="card">
+        <div className="card-head">
+          <span className="card-title">What changes</span>
+        </div>
+        <div className="compare">
+          <div className="compare-row compare-head">
+            <span />
+            <span>Traditional circle</span>
+            <span>On Susunaku</span>
+          </div>
+          {changes.map(([label, before, after]) => (
+            <div className="compare-row" key={label}>
+              <span className="compare-label">{label}</span>
+              <span className="compare-old">{before}</span>
+              <span className="compare-new">{after}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-head">
+          <span className="card-title">Same institution, two continents</span>
+        </div>
+        <NameStrip />
+      </div>
+    </>
+  );
+}
+
 function StatusChip({ state }: { state: string }) {
   const map: Record<string, { cls: string; label: string }> = {
     receiving: { cls: "chip-receives", label: "receives" },
@@ -99,23 +163,32 @@ export function Home({
 
   if (!pollar.address && !fromInvite) {
     return (
-      <section className="hero hero-empty">
-        <div className="kicker">Savings circles on Stellar</div>
-        <h1 className="display display-sm">No circles yet</h1>
-        <p className="hero-sub">
-          Members pay each other directly in USDC, so there is no pot and nobody holding it. Sign
-          in and your circles live here.
-        </p>
-        <div className="cta-row">
-          <button type="button" className="btn btn-primary" onClick={openAuth}>
-            <IconUser size={18} /> Sign in
-          </button>
-          <a className="btn btn-ghost" href="#/how">
-            How it works
-          </a>
-          <span className="marker" />
+      <>
+        <section className="hero hero-empty">
+          <div className="kicker">Savings circles on Stellar</div>
+          <h1 className="display display-sm">No circles yet</h1>
+          <p className="hero-sub">
+            Members pay each other directly in USDC, so there is no pot and nobody holding it.
+          </p>
+          <div className="cta-row">
+            <button type="button" className="btn btn-primary" onClick={openAuth}>
+              <IconUser size={18} /> Sign in
+            </button>
+            <a className="btn btn-ghost" href="#/how">
+              How it works
+            </a>
+            <span className="marker" />
+          </div>
+        </section>
+
+        {/* An account is empty. The page is not: with no data to show, it shows
+            the product — three steps and what actually changes. */}
+        <div className="wrap">
+          <div className="stack" style={{ marginTop: 30 }}>
+            <ProductIntro />
+          </div>
         </div>
-      </section>
+      </>
     );
   }
 
@@ -140,49 +213,13 @@ export function Home({
         </section>
 
         <div className="wrap">
-          <div className="grid-2" style={{ marginTop: 34 }}>
-            <div className="stack">
-              <div className="card">
-                <div className="card-head">
-                  <span className="card-title">The problem, in one line</span>
-                </div>
-                <p className="muted" style={{ fontSize: 14, lineHeight: 1.7, marginTop: 0 }}>
-                  One person holds the cash and keeps the notebook. If they vanish, whoever's turn
-                  it was loses everything.
-                </p>
-                <p className="muted" style={{ fontSize: 14, lineHeight: 1.7 }}>
-                  So members pay each other directly. No vault, no pot, no float.
-                </p>
-              </div>
+          <div className="stack" style={{ marginTop: 30 }}>
+            <ProductIntro />
+          </div>
 
-              <Disclosure
-                title="What happens in a round"
-                summary="contribute · settle in seconds · verify on-chain"
-              >
-                <div className="stack">
-                  {[
-                    ["1 · Contribute", "Each member pays the recipient directly."],
-                    ["2 · Settle", "USDC lands in about five seconds."],
-                    ["3 · Verify", "Every payment is public on-chain."],
-                  ].map(([title, body]) => (
-                    <div key={title}>
-                      <div className="card-title">{title}</div>
-                      <p className="tiny muted" style={{ marginBottom: 0 }}>
-                        {body}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </Disclosure>
-
-              <div className="card">
-                <div className="card-head">
-                  <span className="card-title">Same institution, two continents</span>
-                </div>
-                <NameStrip />
-              </div>
-            </div>
-
+          {/* The product, then the account: a single column reads as one page, where
+              a two-column grid here left half the width empty. */}
+          <div className="stack" style={{ marginTop: 26 }}>
             <div className="stack">
               <Disclosure
                 title={pollar.address ? "Your wallet" : "Sign in"}

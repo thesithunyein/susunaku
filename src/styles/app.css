@@ -203,7 +203,7 @@
 
 /* An empty page should look deliberate, not like a page that failed to load. */
 .hero-empty {
-  padding: 9vh 0 4vh;
+  padding: clamp(26px, 7vh, 84px) 0 0;
 }
 
 /* Two actions are two separate decisions, so they get air between them rather
@@ -946,6 +946,80 @@
 
 .card.section.section-nested > .section-body {
   padding: 0 0 12px;
+}
+
+/* ============================ Steps and comparison ============================ */
+
+.step-n {
+  font-family: var(--f-lcd);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--indigo);
+  margin-bottom: 8px;
+}
+
+.compare {
+  display: grid;
+}
+
+.compare-row {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--hairline-2);
+  font-size: 13px;
+}
+
+.compare-row:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.compare-head {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.compare-label {
+  color: var(--muted);
+}
+
+.compare-old {
+  color: var(--muted-2);
+}
+
+.compare-new {
+  font-weight: 700;
+}
+
+/* Stacked on a phone: the label gets its own line, then before and after. */
+@media (max-width: 560px) {
+  .compare-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 10px;
+    padding: 12px 0;
+  }
+
+  /* The label takes the full width, so the two values need the header row kept
+     — otherwise "The organiser / Nobody" reads as a pair with no order. */
+  .compare-label {
+    grid-column: 1 / -1;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .compare-head {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .compare-head > span:first-child {
+    display: none;
+  }
 }
 
 /* ============================ Stat strip ============================ */
