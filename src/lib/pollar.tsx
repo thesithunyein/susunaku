@@ -48,6 +48,27 @@ export interface PayArgs {
   amount: number;
 }
 
+/** A corridor Pollar can actually execute for this app: country + its fiat. */
+export interface RampCorridor {
+  code: string;
+  currency: string | null;
+}
+
+/** One provider's offer for a corridor, narrowed from the SDK's generated shape. */
+export interface RampQuoteView {
+  quoteId: string;
+  provider: string;
+  rail: string;
+  protocol: string;
+  fee: number | null;
+  feeCurrency: string | null;
+  rate: number | null;
+  estimatedTime: string | null;
+  recommended: boolean;
+  minAmount: number | null;
+  maxAmount: number | null;
+}
+
 interface PollarContextValue {
   hasKey: boolean;
   keyNet: StellarNetwork | null;
@@ -77,6 +98,21 @@ interface PollarContextValue {
   signOut: () => void;
   refreshBalance: () => void;
   ensureUsdcTrustline: () => Promise<{ ok: boolean; message?: string }>;
+  /**
+   * Countries + fiats this app can actually ramp in. Read from the SDK rather
+   * than hardcoded, so the UI can never claim a corridor the backend cannot
+   * execute — an empty list is a real answer, not a bug.
+   */
+  rampCorridors: RampCorridor[] | null;
+  rampCorridorsStatus: "idle" | "loading" | "loaded" | "error";
+  rampCorridorsMessage: string | null;
+  loadRampCorridors: () => void;
+  quoteRamp: (args: {
+    country: string;
+    currency: string;
+    amount: number;
+    direction: "onramp" | "offramp";
+  }) => Promise<RampQuoteView[]>;
   pay: (args: PayArgs) => Promise<SubmitOutcome>;
 }
 
@@ -231,6 +267,11 @@ export function PollarGateway({ children }: { children: ReactNode }) {
   const [email, setEmail] = useState<string | null>(null);
   const [balanceUsdc, setBalanceUsdc] = useState<string | null>(null);
   const [xlmBalance, setXlmBalance] = useState<string | null>(null);
+  const [rampCorridors, setRampCorridors] = useState<RampCorridor[] | null>(null);
+  const [rampCorridorsStatus, setRampCorridorsStatus] = useState<
+    "idle" | "loading" | "loaded" | "error"
+  >("idle");
+  const [rampCorridorsMessage, setRampCorridorsMessage] = useState<string | null>(null);
   const [usdcTrustline, setUsdcTrustline] = useState<boolean | null>(null);
   const [usdcEnabledInApp, setUsdcEnabledInApp] = useState<boolean | null>(null);
   const [txPending, setTxPending] = useState(false);
@@ -310,6 +351,9 @@ export function PollarGateway({ children }: { children: ReactNode }) {
         setEmail(null);
         setBalanceUsdc(null);
         setXlmBalance(null);
+        setRampCorridors(null);
+        setRampCorridorsStatus("idle");
+        setRampCorridorsMessage(null);
         setUsdcTrustline(null);
         setUsdcEnabledInApp(null);
         return;
@@ -518,6 +562,75 @@ export function PollarGateway({ children }: { children: ReactNode }) {
     };
   }, [client]);
 
+  /**
+   * Reads the ramp corridors the backend can genuinely execute.
+   *
+   * A minimal or empty list is a truthful answer: an app that has enabled no
+   * ramp provider has no corridor, and saying so is more useful than showing a
+   * route that would fail at the provider.
+   */
+  const loadRampCorridors = useCallback(async () => {
+    if (!client) return;
+    setRampCorridorsStatus("loading");
+    setRampCorridorsMessage(null);
+    try {
+      const content = (await client.getRampCountries()) as {
+        countries?: { code?: string; currency?: string | null }[];
+      };
+      const list = Array.isArray(content?.countries) ? content.countries : [];
+      setRampCorridors(
+        list.map((entry) => ({
+          code: String(entry.code ?? ""),
+          currency: entry.currency ?? null,
+        }))
+      );
+      setRampCorridorsStatus("loaded");
+    } catch (err) {
+      setRampCorridors(null);
+      setRampCorridorsStatus("error");
+      setRampCorridorsMessage(
+        err instanceof Error ? err.message : "Could not read this app's ramp corridors."
+      );
+    }
+  }, [client]);
+
+  /** Live quote from the providers backing a corridor. Read-only: no order is created. */
+  const quoteRamp = useCallback(
+    async (args: {
+      country: string;
+      currency: string;
+      amount: number;
+      direction: "onramp" | "offramp";
+    }): Promise<RampQuoteView[]> => {
+      if (!client) throw new Error("No Pollar key configured.");
+      const content = (await client.getRampsQuote({
+        country: args.country,
+        currency: args.currency,
+        amount: args.amount,
+        direction: args.direction,
+      })) as { quotes?: Record<string, unknown>[] };
+      const quotes = Array.isArray(content?.quotes) ? content.quotes : [];
+      const num = (value: unknown): number | null =>
+        typeof value === "number" && Number.isFinite(value) ? value : null;
+      const str = (value: unknown): string | null =>
+        typeof value === "string" && value ? value : null;
+      return quotes.map((quote) => ({
+        quoteId: String(quote.quoteId ?? ""),
+        provider: String(quote.provider ?? ""),
+        rail: String(quote.rail ?? ""),
+        protocol: String(quote.protocol ?? ""),
+        fee: num(quote.fee),
+        feeCurrency: str(quote.feeCurrency),
+        rate: num(quote.rate),
+        estimatedTime: str(quote.estimatedTime),
+        recommended: Boolean(quote.recommended),
+        minAmount: num(quote.minAmount),
+        maxAmount: num(quote.maxAmount),
+      }));
+    },
+    [client]
+  );
+
   const pay = useCallback(
     async (args: PayArgs): Promise<SubmitOutcome> => {
       if (!client) {
@@ -587,6 +700,11 @@ export function PollarGateway({ children }: { children: ReactNode }) {
     signOut,
     refreshBalance,
     ensureUsdcTrustline,
+    rampCorridors,
+    rampCorridorsStatus,
+    rampCorridorsMessage,
+    loadRampCorridors: () => void loadRampCorridors(),
+    quoteRamp,
     pay,
   };
 

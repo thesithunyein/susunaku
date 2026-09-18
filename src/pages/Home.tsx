@@ -19,6 +19,7 @@ import { useCircles } from "../lib/store";
 import { useRoundStatus } from "../lib/useRoundStatus";
 import { Chest, Toy } from "../components/art";
 import { AuthCard, KeyForm } from "../components/AuthPanel";
+import { CorridorPanel } from "../components/CorridorPanel";
 import { CIRCLE_NAMES } from "../data/names";
 
 function useNow(intervalMs = 1000): number {
@@ -119,6 +120,7 @@ export function Home({
             </div>
             <div className="stack">
               <AuthCard />
+              <CorridorPanel />
               <div className="card">
                 <div className="card-head">
                   <span className="card-title">Same institution, two continents</span>
@@ -484,6 +486,7 @@ export function Home({
             </div>
 
             {pollar.hasKey ? <AuthCard /> : <div className="card"><KeyForm /></div>}
+            <CorridorPanel />
           </div>
         </div>
       </div>
