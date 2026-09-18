@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Lockup, Coin, Blob, StarCoin, Bolt, Heart, Printer, GridIcon } from "./art";
+import { Lockup } from "./art";
 import { GitHubMark, IconExternal, IconMenu } from "./icons";
 
 export function TopBar({ pill, right }: { pill?: ReactNode; right?: ReactNode }) {
@@ -157,37 +157,5 @@ export function Footer() {
         </a>
       </span>
     </footer>
-  );
-}
-
-/** Illustrated props in the page margins — the brand's own objects, not icons. */
-export function Decor() {
-  return (
-    <div className="decor" aria-hidden="true">
-      <span style={{ top: "15%", left: "3.5%", ["--rot" as string]: "-8deg" }}>
-        <Printer size={46} />
-      </span>
-      <span style={{ top: "29%", left: "7%", ["--rot" as string]: "6deg" }}>
-        <Coin size={38} />
-      </span>
-      <span style={{ top: "43%", left: "3%", ["--rot" as string]: "10deg", animationDelay: "0.6s" }}>
-        <StarCoin size={48} />
-      </span>
-      <span style={{ top: "14%", right: "4%", ["--rot" as string]: "-6deg" }}>
-        <Blob size={42} color="#2FA84F" />
-      </span>
-      <span style={{ top: "27%", right: "8%", ["--rot" as string]: "8deg", animationDelay: "1.1s" }}>
-        <Coin size={40} />
-      </span>
-      <span style={{ top: "37%", right: "3.5%", ["--rot" as string]: "-12deg", animationDelay: "0.3s" }}>
-        <Bolt size={40} />
-      </span>
-      <span style={{ top: "50%", right: "6%", ["--rot" as string]: "10deg", animationDelay: "1.5s" }}>
-        <Heart size={38} />
-      </span>
-      <span style={{ top: "58%", left: "4%", ["--rot" as string]: "12deg", animationDelay: "0.9s" }}>
-        <GridIcon size={40} />
-      </span>
-    </div>
   );
 }

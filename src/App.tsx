@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CountdownPill, Decor, Footer, TopBar, TopBarMenu, type MenuItem } from "./components/chrome";
+import { CountdownPill, Footer, TopBar, TopBarMenu, type MenuItem } from "./components/chrome";
 import { SignInPanel } from "./components/AuthPanel";
 import { Home } from "./pages/Home";
 import { CreateCircle } from "./pages/CreateCircle";
@@ -133,8 +133,6 @@ export default function App() {
 
   return (
     <div className="shell">
-      <Decor />
-
       <div className="wrap">
         <TopBar
           pill={pill}

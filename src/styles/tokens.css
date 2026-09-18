@@ -1,63 +1,74 @@
-/* Susunaku design tokens — warm cream canvas, chunky 3D props, pixel LCD panels. */
+/* Susunaku — design tokens.
+   Flat editorial: a pale canvas, ink type, and no decoration. Hierarchy comes from
+   size, weight and space — not from borders, gradients or drop shadows. Type is one
+   black display face (Epilogue 900) against one text face (DM Sans 400–700). */
+
+@font-face {
+  font-family: "DM Sans";
+  src: url("/fonts/DMSans-Variable.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Epilogue";
+  src: url("/fonts/Epilogue-Black.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
-  /* Canvas */
-  --cream: #faf6ef;
-  --cream-2: #f4e8d4;
-  --cream-3: #efe4cd;
-  --grid-line: rgba(17, 17, 17, 0.045);
-  --grid-size: 46px;
+  /* Canvas and surfaces */
+  --cream: #f0eefa;
+  --cream-2: rgba(8, 9, 9, 0.04);
+  --cream-3: rgba(8, 9, 9, 0.06);
+  --surface: #ffffff;
+  --surface-2: #f7f8fa;
 
   /* Ink */
-  --ink: #0b0b0c;
-  --ink-2: #2f2f35;
-  --muted: #57575f;
-  --muted-2: #7b7b83;
-  --hairline: #e6d9c0;
-  --hairline-2: #f2e3cb;
+  --ink: #080909;
+  --ink-2: #2c2d33;
+  --muted: #63646e;
+  --muted-2: #8a8b94;
+  --hairline: rgba(8, 9, 9, 0.13);
+  --hairline-2: rgba(8, 9, 9, 0.07);
 
-  /* Primary */
+  /* The one accent, taken from the mark. Used for interaction, never for decor. */
   --indigo: #4a54e1;
-  --indigo-dark: #3f49d6;
-  --indigo-soft: #eceefc;
+  --indigo-dark: #3a44cf;
+  --indigo-soft: rgba(74, 84, 225, 0.08);
   --on-primary: #ffffff;
 
-  /* Props */
-  --red: #e5432c;
-  --red-dark: #c0301c;
-  --yellow: #f5c33b;
-  --yellow-dark: #d9a520;
-  --green: #2fa84f;
-  --green-dark: #1f8a3d;
-  --purple: #7b4fbf;
+  /* Status washes: a flat tint, no border */
+  --red: #b9301c;
+  --red-dark: #8f2515;
+  --yellow: #d9a520;
+  --yellow-dark: #7d5c07;
+  --green: #0f7a3d;
+  --green-dark: #14603a;
   --magenta: #e8396b;
   --cyan: #3e9be8;
+  --purple: #7b4fbf;
   --wood: #c08a57;
   --wood-dark: #a8703f;
 
-  /* LCD */
-  --lcd-bg: #101012;
-  --lcd-ink: #f4e8d4;
-
-  /* Shape */
+  /* Shape — pills and one soft radius, nothing in between */
   --r-pill: 999px;
-  --r-card: 22px;
-  --r-lcd: 12px;
+  --r-card: 18px;
+  --r-sm: 12px;
 
-  /* Shadow */
-  --sh-card: 0 10px 26px rgba(60, 40, 10, 0.08);
-  --sh-prop: 0 14px 22px rgba(60, 40, 10, 0.16);
-  --sh-btn: 0 8px 18px rgba(74, 84, 225, 0.28);
-  --sh-rail: 0 8px 20px rgba(60, 40, 10, 0.1);
+  /* Separation is shadow only where it floats: the menu and the sheet. */
+  --sh-pop: 0 18px 44px rgba(20, 16, 40, 0.16);
 
   /* Type */
-  --f-display: "Anton", "Arial Narrow", system-ui, sans-serif;
-  --f-ui: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --f-lcd: "Silkscreen", "Courier New", monospace;
+  --f-display: "Epilogue", "Arial Black", system-ui, sans-serif;
+  --f-ui: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   /* Layout */
-  --rail-w: 76px;
-  --maxw: 1220px;
+  --maxw: 1120px;
 }
 
 * {
@@ -72,23 +83,32 @@ body {
 
 body {
   font-family: var(--f-ui);
+  font-weight: 400;
+  font-size: 15px;
+  /* Never fake a weight the font does not have: synthetic bold next to a real
+     black display face looks like a rendering fault. */
+  font-synthesis: none;
   color: var(--ink);
-  background-color: var(--cream);
-  background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: var(--grid-size) var(--grid-size);
-  background-position: -1px -1px;
+  background: var(--cream);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-button {
-  font-family: inherit;
+h1,
+h2,
+h3 {
+  font-family: var(--f-display);
+  font-weight: 900;
+  letter-spacing: -0.03em;
 }
 
+button,
 input,
-select {
+select,
+textarea {
   font-family: inherit;
+  font-weight: inherit;
+  font-synthesis: none;
 }
 
 a {

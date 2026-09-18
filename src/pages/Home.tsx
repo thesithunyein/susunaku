@@ -17,7 +17,6 @@ import { usePollar } from "../lib/pollar";
 import { circleShareUrl } from "../lib/share";
 import { useCircles } from "../lib/store";
 import { useRoundStatus } from "../lib/useRoundStatus";
-import { Chest, Toy } from "../components/art";
 import { KeyForm, SignInPanel } from "../components/AuthPanel";
 import { CorridorPanel } from "../components/CorridorPanel";
 import { Disclosure } from "../components/Disclosure";
@@ -177,7 +176,6 @@ export function Home({
             <a className="btn btn-ghost" href="#/how">
               How it works
             </a>
-            <span className="marker" />
           </div>
         </section>
 
@@ -208,7 +206,6 @@ export function Home({
             <a className="btn btn-ghost" href="#/how">
               How it works
             </a>
-            <span className="marker" />
           </div>
         </section>
 
@@ -338,7 +335,6 @@ export function Home({
 
         <div className="cta-row">
           {primaryAction}
-          <span className="marker" />
         </div>
 
         {lowGas && iAmContributor ? (
@@ -369,27 +365,6 @@ export function Home({
           </div>
         ) : null}
 
-        <div className="stage">
-          <div className="prop">
-            <Chest
-              label="Left to collect"
-              value={`$${fmtUsdcDisplay(Math.max(0, value - collectedNow))}`}
-              sub={`${paidCount} of ${contributors.length} in`}
-            />
-          </div>
-          <div className="stage-row">
-            {(recipient ? [recipient, ...contributors] : contributors)
-              .slice(0, 6)
-              .map((member, index) => (
-                <div className="prop" key={member.id} style={{ textAlign: "center" }}>
-                  <Toy index={index} size={58} />
-                  <div className="tiny" style={{ fontWeight: 700 }}>
-                    {member.name}
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
       </section>
 
       <div className="wrap">
@@ -400,6 +375,10 @@ export function Home({
             <strong>
               {paidCount}/{contributors.length}
             </strong>
+          </div>
+          <div className="stat">
+            <span className="stat-label">Left to collect</span>
+            <strong>${fmtUsdcDisplay(Math.max(0, value - collectedNow))}</strong>
           </div>
           <div className="stat">
             <span className="stat-label">Recipient</span>
@@ -425,19 +404,9 @@ export function Home({
                     key={status.member.id}
                     className={`member ${status.state === "receiving" ? "member-receives" : ""}`}
                   >
-                    <div
-                      className="member-avatar"
-                      style={{
-                        background:
-                          status.state === "receiving"
-                            ? "var(--yellow-dark)"
-                            : status.state === "paid"
-                              ? "var(--green)"
-                              : "var(--muted-2)",
-                      }}
-                    >
-                      {initials(status.member.name)}
-                    </div>
+                    {/* The state is already said twice in words — the chip and the
+                        row ring. A third, colour-coded avatar only adds noise. */}
+                    <div className="member-avatar">{initials(status.member.name)}</div>
                     <div>
                       <div className="member-name">
                         {status.member.name}

@@ -174,8 +174,8 @@ src/
     share.ts           circles encoded into invite links (no server registry)
     store.ts           local circle store
   components/
-    chrome.tsx         top bar, menu, footer, margin props
-    art.tsx            the logo, chest, toys
+    chrome.tsx         top bar, menu, footer
+    art.tsx            the logo mark and lockup
     icons.tsx          inline SVG icon set (including the official Google and GitHub marks)
     Disclosure.tsx     collapsed sections — the answer first, the explanation on request
     AuthPanel.tsx      sign-in and the wallet card
@@ -191,8 +191,11 @@ scripts/
   check-pollar.mjs      probe the SDK endpoints the app depends on
 ```
 
-Two design decisions worth knowing:
+Design decisions worth knowing:
 
+- **The interface is flat by construction.** Hierarchy comes from type, weight and space — an
+  Epilogue Black headline against DM Sans body — not from bordered cards. White is spent only
+  where content genuinely needs containment: a value panel, a row that is a record, the sheet.
 - **Rounds are never pooled.** The recipient of a round receives N−1 direct payments. This is what
   removes the custodian, and it is also why nothing here needs a licence to hold funds.
 - **We do not keep a payment ledger.** `useRoundStatus` asks Horizon what actually moved, and
