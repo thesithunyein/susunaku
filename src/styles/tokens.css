@@ -1,0 +1,96 @@
+/* Susunaku design tokens — warm cream canvas, chunky 3D props, pixel LCD panels. */
+
+:root {
+  /* Canvas */
+  --cream: #faf6ef;
+  --cream-2: #f4e8d4;
+  --cream-3: #efe4cd;
+  --grid-line: rgba(17, 17, 17, 0.045);
+  --grid-size: 46px;
+
+  /* Ink */
+  --ink: #0b0b0c;
+  --ink-2: #2f2f35;
+  --muted: #57575f;
+  --muted-2: #7b7b83;
+  --hairline: #e6d9c0;
+  --hairline-2: #f2e3cb;
+
+  /* Primary */
+  --indigo: #4a54e1;
+  --indigo-dark: #3f49d6;
+  --indigo-soft: #eceefc;
+  --on-primary: #ffffff;
+
+  /* Props */
+  --red: #e5432c;
+  --red-dark: #c0301c;
+  --yellow: #f5c33b;
+  --yellow-dark: #d9a520;
+  --green: #2fa84f;
+  --green-dark: #1f8a3d;
+  --purple: #7b4fbf;
+  --magenta: #e8396b;
+  --cyan: #3e9be8;
+  --wood: #c08a57;
+  --wood-dark: #a8703f;
+
+  /* LCD */
+  --lcd-bg: #101012;
+  --lcd-ink: #f4e8d4;
+
+  /* Shape */
+  --r-pill: 999px;
+  --r-card: 22px;
+  --r-lcd: 12px;
+
+  /* Shadow */
+  --sh-card: 0 10px 26px rgba(60, 40, 10, 0.08);
+  --sh-prop: 0 14px 22px rgba(60, 40, 10, 0.16);
+  --sh-btn: 0 8px 18px rgba(74, 84, 225, 0.28);
+  --sh-rail: 0 8px 20px rgba(60, 40, 10, 0.1);
+
+  /* Type */
+  --f-display: "Anton", "Arial Narrow", system-ui, sans-serif;
+  --f-ui: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-lcd: "Silkscreen", "Courier New", monospace;
+
+  /* Layout */
+  --rail-w: 76px;
+  --maxw: 1220px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--f-ui);
+  color: var(--ink);
+  background-color: var(--cream);
+  background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+  background-position: -1px -1px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  font-family: inherit;
+}
+
+input,
+select {
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+}
