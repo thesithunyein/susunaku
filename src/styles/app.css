@@ -854,6 +854,23 @@
   flex-wrap: wrap;
 }
 
+/* A disclosure opened inside another one: a divided row, not a card in a card. */
+.card.section.section-nested {
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--hairline);
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.card.section.section-nested > .section-head {
+  padding: 14px 0 6px;
+}
+
+.card.section.section-nested > .section-body {
+  padding: 0 0 12px;
+}
+
 /* ============================ Stat strip ============================ */
 
 .stat-row {

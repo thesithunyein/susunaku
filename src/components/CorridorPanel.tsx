@@ -7,6 +7,7 @@ import {
   LATAM_LEGS,
   type CorridorLeg,
 } from "../lib/corridor";
+import { Disclosure } from "./Disclosure";
 import { fmtUsdcDisplay } from "../lib/format";
 import { NETWORK } from "../lib/config";
 import { IconCheck, IconCopy, IconSpark } from "./icons";
@@ -80,8 +81,7 @@ export function CorridorPanel({ bare = false }: { bare?: boolean } = {}) {
   if (!address) {
     const empty = (
       <p className="tiny muted" style={{ margin: 0 }}>
-        Sign in and this fills in with your own rails — where your money can come from, and where a
-        round can be cashed out.
+        Sign in to see where your money can come in and out.
       </p>
     );
     return bare ? (
@@ -149,9 +149,8 @@ export function CorridorPanel({ bare = false }: { bare?: boolean } = {}) {
           onFocus={(event) => event.currentTarget.select()}
         />
         <span className="hint">
-          USDC {fmtUsdcDisplay(balanceUsdc)} · XLM {xlmBalance ?? "—"} on {NETWORK}. The USDC
-          trustline is already open, so a bank, an exchange or a ramp can send here without asking
-          us first.
+          USDC {fmtUsdcDisplay(balanceUsdc)} · XLM {xlmBalance ?? "—"} on {NETWORK}. The trustline
+          is open, so any bank, exchange or ramp can send here.
         </span>
       </div>
       <div className="cta-row" style={{ flexDirection: "row", gap: 10 }}>
@@ -176,11 +175,11 @@ export function CorridorPanel({ bare = false }: { bare?: boolean } = {}) {
       <div style={{ marginTop: 18 }}>
         <div className="card-title">Corridors this app can execute</div>
         {rampCorridorsStatus === "loading" ? (
-          <p className="tiny muted">Reading the ramp corridors Pollar has enabled for this app…</p>
+          <p className="tiny muted">Checking which corridors this app can use…</p>
         ) : rampCorridorsStatus === "error" ? (
           <div className="note note-warn tiny">
-            Could not read this app's corridors ({rampCorridorsMessage}). The routes below are still
-            what Pollar supports — none of them are invented.
+            Could not read this app's corridors ({rampCorridorsMessage}). The routes below are what
+            Pollar supports — none invented.
           </div>
         ) : rampCorridors && rampCorridors.length > 0 ? (
           <>
@@ -257,38 +256,46 @@ export function CorridorPanel({ bare = false }: { bare?: boolean } = {}) {
           </>
         ) : (
           <div className="note note-warn tiny">
-            <strong>No corridor is enabled for this app yet</strong>, so the SDK returns an empty
-            list and we show you nothing to click. Turn on a provider in Dashboard → Integrations →
-            Ramps (and its asset in Tokens / Trustlines) and this section fills itself in — no code
-            change. That empty list is the honest answer, not a loading state.
+            <strong>No corridor is enabled for this app yet.</strong> Turn one on in Dashboard →
+            Integrations → Ramps and this fills itself in, no code change.
           </div>
         )}
       </div>
 
+      {/* Nine legs is research, not an action. Nested so opening this panel does
+          not dump a wall of routes between a member and their next payment. */}
       <div style={{ marginTop: 18 }}>
-        <div className="card-title">Latin America · the operating legs</div>
-        <div className="members">
-          {LATAM_LEGS.map((leg) => (
-            <LegRow key={leg.id} leg={leg} />
-          ))}
-        </div>
+        <Disclosure
+          className="section-nested"
+          title="Latin America · the operating legs"
+          summary={`${LATAM_LEGS.length} providers · Pollar runs this side`}
+        >
+          <div className="members">
+            {LATAM_LEGS.map((leg) => (
+              <LegRow key={leg.id} leg={leg} />
+            ))}
+          </div>
+        </Disclosure>
       </div>
 
-      <div style={{ marginTop: 18 }}>
-        <div className="card-title">Africa · the leg that has to be built</div>
-        <div className="note note-warn tiny">{AFRICAN_GAP}</div>
-        <div className="members">
-          {AFRICAN_LEGS.map((leg) => (
-            <LegRow key={leg.id} leg={leg} />
-          ))}
-        </div>
+      <div style={{ marginTop: 10 }}>
+        <Disclosure
+          className="section-nested"
+          title="Africa · the leg that has to be built"
+          summary={`${AFRICAN_LEGS.length} candidate rails · designed, not wired`}
+        >
+          <div className="note note-warn tiny">{AFRICAN_GAP}</div>
+          <div className="members">
+            {AFRICAN_LEGS.map((leg) => (
+              <LegRow key={leg.id} leg={leg} />
+            ))}
+          </div>
+        </Disclosure>
       </div>
 
       <p className="tiny muted" style={{ marginTop: 14, marginBottom: 0 }}>
-        Fees: Pollar sponsors the wallet and its trustlines, and the operator can also sponsor
-        payments themselves (Dashboard → Treasury → Sponsorship, with a funded gas wallet). A member
-        holding zero XLM can contribute only while that sponsorship is on — which is exactly the
-        setting a real deployment needs.
+        Pollar sponsors the wallet and its trustlines. Payment fees come from a member's own XLM
+        unless the operator turns on payment sponsorship in Dashboard → Treasury → Sponsorship.
       </p>
     </>
   );

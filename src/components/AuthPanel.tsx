@@ -28,8 +28,8 @@ export function KeyForm() {
     return (
       <div className="stack">
         <div className="note note-good">
-          Pollar key connected{keyNet ? ` (${keyNet})` : ""}. Payments run on{" "}
-          <strong>{NETWORK}</strong> with USDC <code>{shortAddr(USDC_ISSUER_ACTIVE, 4)}</code>.
+          Connected{keyNet ? ` · ${keyNet}` : ""} · USDC on <strong>{NETWORK}</strong>{" "}
+          <code>{shortAddr(USDC_ISSUER_ACTIVE, 4)}</code>
         </div>
         <button type="button" className="btn btn-ghost" onClick={clearKey}>
           Disconnect key
@@ -63,13 +63,12 @@ export function KeyForm() {
           spellCheck={false}
         />
         <span className="hint">
-          Create an app at{" "}
+          From{" "}
           <a className="link" href="https://dashboard.pollar.xyz" target="_blank" rel="noreferrer">
             dashboard.pollar.xyz
           </a>{" "}
-          → Build → API Keys. Testnet keys are issued instantly; mainnet needs your own
-          identity verification. The publishable key is safe in a browser; never paste a
-          <code> sec_ </code> key here.
+          → Build → API Keys. Publishable keys belong in a browser; never paste a{" "}
+          <code>sec_</code> key.
         </span>
       </div>
       {error ? <div className="note note-bad">{error}</div> : null}
@@ -127,9 +126,7 @@ export function SignInPanel() {
   if (status === "ready" && address) {
     return (
       <div className="stack">
-        <div className="note note-good">
-          Signed in{email ? ` as ${email}` : ""}. This wallet is yours — we never hold it.
-        </div>
+        <div className="note note-good">Signed in{email ? ` as ${email}` : ""}.</div>
 
         <div className="lcd">
           <div className="lcd-label">Balance</div>
@@ -142,7 +139,7 @@ export function SignInPanel() {
         {/* Only the unhappy path earns a banner. A working trustline is not news. */}
         {usdcTrustline === false ? (
           <div className="note note-warn">
-            No USDC trustline on this wallet yet, so it cannot hold USDC.{" "}
+            This wallet can't hold USDC yet.{" "}
             <button
               type="button"
               className="link"
@@ -159,8 +156,7 @@ export function SignInPanel() {
         ) : null}
         {usdcEnabledInApp === false ? (
           <div className="note note-warn">
-            USDC is not enabled for this app yet — add it in the Pollar dashboard under Build →
-            Tokens / Trustlines, or no wallet can hold it.
+            USDC isn't enabled for this app. Add it under Build → Tokens / Trustlines.
           </div>
         ) : null}
         {trustMsg ? <div className="note note-info">{trustMsg}</div> : null}
@@ -225,8 +221,8 @@ export function SignInPanel() {
               />
               <span className="hint">
                 {authStep === "sending_email"
-                  ? "Sending… if nothing arrives in a minute, send it again."
-                  : "We will email you a six-digit code."}
+                  ? "Sending… nothing after a minute? Send it again."
+                  : "We email you a six-digit code."}
               </span>
             </div>
             {mailError ? <div className="note note-bad">{mailError}</div> : null}
@@ -299,9 +295,7 @@ export function SignInPanel() {
             placeholder="you@example.com"
             autoComplete="email"
           />
-          <span className="hint">
-            We email a six-digit code — there is no password to create and nothing to write down.
-          </span>
+          <span className="hint">No password. We email a six-digit code.</span>
         </div>
         <button type="submit" className="btn btn-ghost btn-block">
           Email me a sign-in code

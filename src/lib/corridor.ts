@@ -43,8 +43,7 @@ export const LATAM_LEGS: CorridorLeg[] = [
     direction: "both",
     provider: "Stereum",
     status: "live",
-    note:
-      "Buy with a bank QR, sell straight to a bank account. This is the live ramp the hackathon's Latin America side runs on.",
+    note: "Buy by bank QR, sell to a bank account.",
   },
   {
     id: "br-pix-bridge",
@@ -64,8 +63,7 @@ export const LATAM_LEGS: CorridorLeg[] = [
     direction: "in",
     provider: "PagFinance",
     status: "live",
-    note:
-      "On-ramp live. The off-ramp is deliberately declined: it pays into a shared receiver, so an order cannot be attributed.",
+    note: "On-ramp only: its off-ramp pays a shared receiver, so an order can't be attributed.",
   },
   {
     id: "br-co-abroad",
@@ -75,7 +73,7 @@ export const LATAM_LEGS: CorridorLeg[] = [
     direction: "out",
     provider: "Abroad Finance",
     status: "live",
-    note: "Cash-out only. COP over BreB is one of the few non-Pix LatAm rails.",
+    note: "Cash-out only. COP over BreB is a rare non-Pix rail.",
   },
   {
     id: "mx-spei",
@@ -85,7 +83,7 @@ export const LATAM_LEGS: CorridorLeg[] = [
     direction: "both",
     provider: "Etherfuse",
     status: "live",
-    note: "SPEI both ways, with per-user hosted KYC.",
+    note: "SPEI both ways, hosted KYC.",
   },
   {
     id: "anclap",
@@ -95,16 +93,15 @@ export const LATAM_LEGS: CorridorLeg[] = [
     direction: "both",
     provider: "Anclap",
     status: "live",
-    note: "Interoperable escape hatch: any SEP-24 anchor reachable through one adapter.",
+    note: "Any SEP-24 anchor, through one adapter.",
   },
 ];
 
 /** Stated once so the UI and the write-up can never drift apart. */
 export const AFRICAN_GAP =
-  "Every ramp Pollar can execute today is Latin American — Pix, BreB, SPEI and the Bolivian " +
-  "BOB rails. There is no African corridor in the SDK. That is the whole reason the hackathon's " +
-  "flagship asks a builder to make that leg exist, and it is the leg that decides whether a " +
-  "circle with members in Ghana and Nairobi is usable or merely demonstrable.";
+  "Every ramp Pollar can execute today is Latin American: Pix, BreB, SPEI, BOB. There is no " +
+  "African corridor in the SDK — which is the leg that decides whether a circle with members in " +
+  "Ghana and Nairobi is usable or just demonstrable.";
 
 /**
  * African legs — designed, not integrated.
@@ -123,7 +120,7 @@ export const AFRICAN_LEGS: CorridorLeg[] = [
     provider: "Eversend (USDC ramp API)",
     status: "designed",
     note:
-      "Stablecoin ↔ mobile money and bank payout across 18 African markets. Designed in, not wired: the same pattern as Pollar's SEP-24 adapter, pointed at an African partner.",
+      "Mobile money and bank payout across 18 African markets. Same shape as Pollar's SEP-24 adapter.",
   },
   {
     id: "af-momo-partner-2",
@@ -133,7 +130,7 @@ export const AFRICAN_LEGS: CorridorLeg[] = [
     direction: "both",
     provider: "Yativo",
     status: "designed",
-    note: "Second candidate rail, held as a fallback so the path does not depend on one partner.",
+    note: "A second rail, so the path doesn't depend on one partner.",
   },
   {
     id: "af-semi-manual",
@@ -144,7 +141,7 @@ export const AFRICAN_LEGS: CorridorLeg[] = [
     provider: "Circle organiser + local agent",
     status: "designed",
     note:
-      "The documented semi-manual path the brief explicitly allows: the organiser's own float covers a member's contribution in USDC, and settles in local cash the same day. It is what susu collectors already do — the difference is the ledger.",
+      "The organiser's float covers a contribution in USDC and settles in local cash the same day — what susu collectors already do.",
   },
 ];
 
@@ -153,6 +150,5 @@ export const AFRICAN_LEGS: CorridorLeg[] = [
  * never share a currency, only an asset.
  */
 export const CORRIDOR_IN_ONE_LINE =
-  "A member in Africa pays in from a mobile-money rail; a member in Bolivia cashes out on the BOB " +
-  "ramp; both meet in USDC on Stellar. No shared bank, no shared currency, no intermediary holding " +
-  "the float.";
+  "A member in Africa pays in from mobile money. A member in Bolivia cashes out on the BOB ramp. " +
+  "Both meet in USDC on Stellar.";

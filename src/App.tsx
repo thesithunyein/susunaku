@@ -175,14 +175,14 @@ export default function App() {
           className="modal-backdrop"
           role="dialog"
           aria-modal="true"
-          aria-label="Your wallet"
+          aria-label={pollar.address ? "Your wallet" : "Sign in"}
           onClick={(event) => {
             if (event.target === event.currentTarget) setAuthOpen(false);
           }}
         >
           <div className="modal">
             <div className="card-head">
-              <span className="card-title">Your wallet</span>
+              <span className="card-title">{pollar.address ? "Your wallet" : "Sign in"}</span>
               <button
                 type="button"
                 className="btn btn-ghost btn-sm icon-btn"
@@ -194,9 +194,7 @@ export default function App() {
             </div>
             <SignInPanel />
             <p className="tiny muted" style={{ marginBottom: 0 }}>
-              No seed phrase and no browser extension: Pollar creates a Stellar wallet for you and
-              sponsors the wallet itself. Stellar's network fee still comes from your own XLM —
-              about a hundredth of a cent per payment.
+              The wallet is created on first sign-in and stays yours. No seed phrase, no extension.
             </p>
           </div>
         </div>

@@ -28,12 +28,11 @@ export function JoinCircle({ payload }: { payload: string }) {
         <>
           <h1 className="display display-sm">You're in</h1>
           <p className="hero-sub">
-            {name} is now on this device, along with its amount, cadence and rotation order.
-            Opening the round…
+            {name} is on this device now. Opening the round…
           </p>
           <div className="note note-info">
-            Nothing was registered anywhere. The circle travelled in the link, and the money
-            only ever moves between members' own wallets.
+            Nothing was registered. The circle came in the link, and money moves only between
+            members' own wallets.
           </div>
         </>
       ) : null}

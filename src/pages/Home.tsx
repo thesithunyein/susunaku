@@ -94,11 +94,9 @@ export function Home({
     return (
       <>
         <section className="hero">
-          <div className="kicker">Susunaku · savings circles settled in USDC on Stellar</div>
+          <div className="kicker">Savings circles on Stellar</div>
           <h1 className="display">$0.00</h1>
-          <p className="hero-sub">
-            That is how much of your money Susunaku holds. It will stay that way.
-          </p>
+          <p className="hero-sub">How much of your money we hold. It stays that way.</p>
           <div className="cta-row">
             <a className="btn btn-primary" href="#/new">
               Start a circle
@@ -115,14 +113,11 @@ export function Home({
                   <span className="card-title">The problem, in one line</span>
                 </div>
                 <p className="muted" style={{ fontSize: 14, lineHeight: 1.7, marginTop: 0 }}>
-                  A rotating savings circle has exactly one weak point: one person holds the pooled
-                  cash and keeps the notebook. When that person disappears, whoever's turn it was
-                  loses everything — and the circle dies with them.
+                  One person holds the cash and keeps the notebook. If they vanish, whoever's turn
+                  it was loses everything.
                 </p>
                 <p className="muted" style={{ fontSize: 14, lineHeight: 1.7 }}>
-                  Every digital tool so far rebuilt the notebook. Susunaku removes the vault: each
-                  round, members pay the recipient directly. Nothing is ever pooled, so there is no
-                  custodian — and no pot to steal.
+                  So members pay each other directly. No vault, no pot, no float.
                 </p>
               </div>
 
@@ -132,9 +127,9 @@ export function Home({
               >
                 <div className="stack">
                   {[
-                    ["1 · Contribute", "Every member pays the round's recipient from their own wallet."],
-                    ["2 · Settle", "USDC moves wallet to wallet on Stellar in about five seconds."],
-                    ["3 · Verify", "Anyone can check the round on-chain. No one has to be trusted."],
+                    ["1 · Contribute", "Each member pays the recipient directly."],
+                    ["2 · Settle", "USDC lands in about five seconds."],
+                    ["3 · Verify", "Every payment is public on-chain."],
                   ].map(([title, body]) => (
                     <div key={title}>
                       <div className="card-title">{title}</div>
@@ -238,9 +233,10 @@ export function Home({
       className="btn btn-primary"
       onClick={runPay}
       disabled={paying || pollar.txPending || finished}
-    >            {paying || pollar.txPending ? <span className="spin" /> : <IconSend size={18} />}
-            Pay my contribution — {fmtUsdcDisplay(circle.amountUsdc)} USDC
-          </button>
+    >
+      {paying || pollar.txPending ? <span className="spin" /> : <IconSend size={18} />}
+      Pay my contribution — {fmtUsdcDisplay(circle.amountUsdc)} USDC
+    </button>
   ) : iAmRecipient ? (
     <span className="btn btn-primary" style={{ cursor: "default", opacity: 0.92 }}>
       <IconCheck size={18} /> You receive this round
@@ -276,10 +272,8 @@ export function Home({
             role="status"
             style={{ maxWidth: 560, margin: "14px auto 0", textAlign: "left" }}
           >
-            This wallet holds no XLM. Stellar takes a payment's fee from the sender's own balance —
-            Pollar sponsors the wallet and its trustlines, not that fee — so this contribution would
-            be refused before it is submitted. Add a little XLM (a few cents covers thousands of
-            payments) and try again.
+            This wallet has no XLM. Stellar charges the sender a fee, so the payment won't submit.
+            Add a little XLM to continue.
           </div>
         ) : null}
         {/* A payment that succeeds or fails has to be announced, not just
@@ -401,7 +395,7 @@ export function Home({
               <div className="section-foot">
                 <span className="tiny muted">
                   {checkedAt
-                    ? `Last chain check ${fmtDate(checkedAt)} · read from Horizon, not from our database`
+                    ? `Checked on-chain ${fmtDate(checkedAt)} — from Horizon, not our database`
                     : "Waiting for the first chain check…"}
                 </span>
                 <button type="button" className="btn btn-ghost btn-sm" onClick={refresh}>
@@ -416,9 +410,7 @@ export function Home({
               title="Receipts"
               summary={
                 receiptCount === 0
-                  ? "none confirmed yet"
-                  : `${receiptCount} confirmed · checkable by anyone`
-              }
+                  ? "none confirmed yet"                  : `${receiptCount} confirmed · public`}
             >
               {receiptCount === 0 ? (
                 <p className="tiny muted" style={{ margin: 0 }}>
@@ -476,16 +468,14 @@ export function Home({
                 </div>
               </div>
               <p className="tiny muted">
-                Every contribution in this round moves from a member's own wallet to the recipient's
-                own wallet. There is no intermediate account, no pooled balance and no operator
-                holding the float — which is also why nothing here needs a license to custody money.
+                Member to recipient, directly. No pooled balance, no operator float.
               </p>
               <div className="lcd">
                 <div className="lcd-label">This round ends in</div>
                 <div className="lcd-value">{finished ? "CLOSED" : fmtCountdown(remaining)}</div>
                 <div className="lcd-sub">
                   {roundsRemaining(circle, now)} rounds after this ·{" "}
-                  {paymentsPerMemberPerYear(circle)} payments per member per year at this cadence
+                  {paymentsPerMemberPerYear(circle)} payments per member a year
                 </div>
               </div>
             </Disclosure>
@@ -497,8 +487,7 @@ export function Home({
               summary={`${circle.members.length} members · one link, no sign-up`}
             >
               <p className="tiny muted">
-                The whole circle travels in one link: amount, cadence, members and rotation order.
-                Nobody has to register anywhere for the circle to exist.
+                Amount, cadence, members and rotation travel in one link.
               </p>
               <button
                 type="button"
@@ -540,7 +529,7 @@ export function Home({
 
             <Disclosure
               title="Money in and out"
-              summary="how a member funds this seat, and cashes out"
+              summary="fund a seat, or cash out a round"
             >
               <CorridorPanel bare />
             </Disclosure>

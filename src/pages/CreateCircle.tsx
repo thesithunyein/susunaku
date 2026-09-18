@@ -5,7 +5,6 @@ import {
   newCircleId,
   newMemberId,
   normalizeAddress,
-  paymentsPerMemberPerYear,
   roundValue,
   type Cadence,
   type Circle,
@@ -131,15 +130,13 @@ export function CreateCircle() {
         <div className="card stack">
           <div className="note note-good">
             Round 1 pays <strong>{created.members[0].name}</strong>{" "}
-            {fmtUsdcDisplay(roundValue(created, 0))} USDC. Send everyone the link below so their
-            browsers know the circle too.
+            {fmtUsdcDisplay(roundValue(created, 0))} USDC. Send everyone the link below.
           </div>
           <div className="field">
             <label htmlFor="invite">Invite link</label>
             <input id="invite" readOnly value={url} onFocus={(e) => e.currentTarget.select()} />
             <span className="hint">
-              The circle definition travels in this link — amount, cadence, members and rotation
-              order. No sign-up required to view it.
+              The whole circle travels in this link. No sign-up to view it.
             </span>
           </div>
           <div className="cta-row" style={{ flexDirection: "row", gap: 10 }}>
@@ -162,10 +159,7 @@ export function CreateCircle() {
   return (
     <div className="wrap" style={{ maxWidth: 780 }}>
       <h1 className="display display-sm">New circle</h1>
-      <p className="hero-sub">
-        Agree on an amount, a cadence and a rotation order. Nobody has to be trusted with the
-        money at any point.
-      </p>
+      <p className="hero-sub">Set an amount, a cadence, and who receives each round.</p>
 
       <div className="card stack">
         <div className="row">
@@ -199,10 +193,7 @@ export function CreateCircle() {
               <option value="weekly">Every week</option>
               <option value="monthly">Every month</option>
             </select>
-            <span className="hint">
-              Daily and weekly are how collectors actually work — and each collection is one
-              transaction.
-            </span>
+            <span className="hint">Daily is how collectors work.</span>
           </div>
         </div>
 
@@ -253,7 +244,7 @@ export function CreateCircle() {
                     ? isStellarAddress(member.address)
                       ? `Looks valid · ${shortAddr(normalizeAddress(member.address), 6)}`
                       : "A Stellar address is 56 characters and starts with G."
-                    : "Export it from their Pollar wallet."}
+                    : "From their wallet."}
                 </span>
               </div>
               {members.length > 2 ? (
@@ -280,7 +271,7 @@ export function CreateCircle() {
           title="What this circle moves"
           summary={`$${fmtUsdcDisplay(preview.round)} a round · $${fmtUsdcDisplay(
             preview.lifetime
-          )} over ${members.length} rounds · ${preview.perYear} payments each per year`}
+          )} over ${members.length} rounds`}
         >
           <div className="grid-3">
             <div className="lcd">
@@ -294,6 +285,7 @@ export function CreateCircle() {
             <div className="lcd">
               <div className="lcd-label">Payments / member / year</div>
               <div className="lcd-value">{preview.perYear}</div>
+              <div className="lcd-sub">At this cadence — that is the volume Pollar earns on.</div>
             </div>
           </div>
         </Disclosure>
@@ -301,8 +293,8 @@ export function CreateCircle() {
         {error ? <div className="note note-bad">{error}</div> : null}
         {!hasKey ? (
           <div className="note note-warn">
-            No Pollar key connected yet — you can still create the circle, but payments need a
-            key. Add one from the Connect Pollar button in the rail.
+            No key connected. You can still create the circle — payments need a key, added under
+            Network &amp; key in the menu.
           </div>
         ) : null}
 
@@ -312,8 +304,4 @@ export function CreateCircle() {
       </div>
     </div>
   );
-}
-
-export function paymentsPerYearFor(circle: Circle): number {
-  return paymentsPerMemberPerYear(circle);
 }
