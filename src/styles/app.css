@@ -297,8 +297,10 @@
 
 .empty-first .toy-stage {
   flex: 1 1 auto;
-  min-height: 260px;
   height: auto;
+  /* Ratio guard: stage width ≈ viewport, so 42vw minimum keeps the box from
+     ever going wide-and-slim enough for cover to crop his face. */
+  min-height: clamp(300px, 42vw, 640px);
   margin-top: clamp(4px, 1.5vh, 14px);
 }
 
@@ -312,7 +314,7 @@
      never crops the character down to a slice of face on huge monitors. */
   width: min(calc(100% + 56px), 1500px);
   margin: clamp(6px, 2vh, 22px) auto 0;
-  height: clamp(300px, 42vw, 600px);
+  height: clamp(300px, 42vw, 640px);
   overflow: hidden;
   pointer-events: none;
 }
@@ -324,7 +326,10 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  /* Anchor him to the stage's bottom edge: cover-cropping then eats only the
+     empty background above his head, and he rises from the section boundary
+     like on the reference page — never a face sliced mid-eye. */
+  object-position: center bottom;
 }
 
 @media (max-width: 700px) {
