@@ -10,8 +10,9 @@ export function HowItWorks() {
   const { t } = useLang();
   return (
     <div className="wrap" style={{ maxWidth: 900 }}>
-      <h1 className="display display-sm">No pot to steal</h1>
-      <p className="hero-sub">A savings circle with no cash box.</p>
+      <div className="kicker">Susunaku</div>
+      <h1 className="display display-sm">{t("action.how")}</h1>
+      <p className="hero-sub">{t("how.sub")}</p>
 
       <div className="grid-3">
         {[
