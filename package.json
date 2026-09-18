@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "pollar:check": "node scripts/check-pollar.mjs"
   },
   "dependencies": {
     "@pollar/core": "^0.11.0",

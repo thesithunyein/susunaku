@@ -88,6 +88,9 @@ export function SignInPanel() {
     address,
     email,
     balanceUsdc,
+    usdcTrustline,
+    usdcEnabledInApp,
+    ensureUsdcTrustline,
     loginGoogle,
     beginEmail,
     sendEmailCode,
@@ -99,6 +102,7 @@ export function SignInPanel() {
 
   const [mail, setMail] = useState("");
   const [code, setCode] = useState("");
+  const [trustMsg, setTrustMsg] = useState<string | null>(null);
 
   if (status === "ready" && address) {
     return (
@@ -113,10 +117,37 @@ export function SignInPanel() {
           </div>
           <div className="lcd-sub">USDC balance</div>
           <div className="lcd-value">{fmtUsdcDisplay(balanceUsdc)}</div>
+          <div className="lcd-sub">USDC trustline</div>
+          <div className="lcd-value" style={{ fontSize: 15 }}>
+            {usdcTrustline === null
+              ? "checking…"
+              : usdcTrustline
+                ? "established"
+                : "missing"}
+          </div>
         </div>
+        {usdcEnabledInApp === false ? (
+          <div className="note note-warn">
+            USDC is not enabled for this app yet — add it in the Pollar dashboard under Build →
+            Tokens / Trustlines, or no wallet can hold it.
+          </div>
+        ) : null}
+        {trustMsg ? <div className="note note-info">{trustMsg}</div> : null}
         <div className="cta-row" style={{ flexDirection: "row", gap: 10, justifyContent: "center" }}>
           <button type="button" className="btn btn-ghost btn-sm" onClick={refreshBalance}>
             Refresh balance
+          </button>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => {
+              setTrustMsg("Preparing the USDC trustline…");
+              void ensureUsdcTrustline().then((result) =>
+                setTrustMsg(result.ok ? "USDC trustline ready." : result.message ?? "Failed.")
+              );
+            }}
+          >
+            Prepare USDC
           </button>
           <button type="button" className="btn btn-ghost btn-sm" onClick={signOut}>
             Sign out

@@ -52,6 +52,10 @@ interface PollarContextValue {
   address: string | null;
   email: string | null;
   balanceUsdc: string | null;
+  /** null while unknown (signed out, or the asset list hasn't loaded yet). */
+  usdcTrustline: boolean | null;
+  /** Whether this app has USDC enabled at all. null while unknown. */
+  usdcEnabledInApp: boolean | null;
   txPending: boolean;
   saveKey: (key: string) => { ok: boolean; error?: string };
   clearKey: () => void;
@@ -62,6 +66,7 @@ interface PollarContextValue {
   cancelLogin: () => void;
   signOut: () => void;
   refreshBalance: () => void;
+  ensureUsdcTrustline: () => Promise<{ ok: boolean; message?: string }>;
   pay: (args: PayArgs) => Promise<SubmitOutcome>;
 }
 
@@ -95,6 +100,48 @@ function readBalance(client: PollarClient, issuer: string): string | null {
   return pickUsdc(state?.data?.balances, issuer);
 }
 
+interface UsdcAssetInfo {
+  enabledInApp: boolean | null;
+  trustlineEstablished: boolean;
+  sponsored: boolean | null;
+  walletExists: boolean;
+}
+
+/**
+ * Reads the app's enabled-asset records for USDC.
+ *
+ * `trustlineEstablished` is the field that decides whether a contribution can
+ * land at all: a Stellar wallet cannot receive an asset it holds no trustline
+ * for, and a first-time member has never heard the word.
+ */
+function readUsdcAsset(client: PollarClient): UsdcAssetInfo | null {
+  let raw: unknown;
+  try {
+    raw = client.getEnabledAssetsState();
+  } catch {
+    return null;
+  }
+  const state = raw as { step?: string; data?: { exists?: boolean; assets?: unknown } };
+  if (state?.step !== "loaded" || !state.data) return null;
+  const list = Array.isArray(state.data.assets) ? state.data.assets : [];
+  const wanted = USDC_ISSUER_ACTIVE.toUpperCase();
+  for (const entry of list) {
+    if (!entry || typeof entry !== "object") continue;
+    const record = entry as Record<string, unknown>;
+    const code = String(record.code ?? record.assetCode ?? "").toUpperCase();
+    const issuer = String(record.issuer ?? record.assetIssuer ?? "").toUpperCase();
+    if (code !== "USDC") continue;
+    if (issuer && issuer !== wanted) continue;
+    return {
+      enabledInApp: record.enabledInApp === undefined ? null : Boolean(record.enabledInApp),
+      trustlineEstablished: Boolean(record.trustlineEstablished),
+      sponsored: record.sponsored === undefined ? null : Boolean(record.sponsored),
+      walletExists: Boolean(state.data.exists),
+    };
+  }
+  return null;
+}
+
 export function PollarGateway({ children }: { children: ReactNode }) {
   const [apiKey, setApiKey] = useState<string | null>(() => resolveApiKey());
   const [status, setStatus] = useState<PollarStatus>(apiKey ? "initialising" : "no-key");
@@ -102,6 +149,8 @@ export function PollarGateway({ children }: { children: ReactNode }) {
   const [address, setAddress] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [balanceUsdc, setBalanceUsdc] = useState<string | null>(null);
+  const [usdcTrustline, setUsdcTrustline] = useState<boolean | null>(null);
+  const [usdcEnabledInApp, setUsdcEnabledInApp] = useState<boolean | null>(null);
   const [txPending, setTxPending] = useState(false);
   const addressRef = useRef<string | null>(null);
 
@@ -144,6 +193,14 @@ export function PollarGateway({ children }: { children: ReactNode }) {
         .refreshBalance()
         .then(() => setBalanceUsdc(readBalance(client, USDC_ISSUER_ACTIVE)))
         .catch(() => setBalanceUsdc(null));
+      void client
+        .refreshAssets()
+        .catch(() => undefined)
+        .then(() => {
+          const info = readUsdcAsset(client);
+          setUsdcTrustline(info ? info.trustlineEstablished : null);
+          setUsdcEnabledInApp(info ? info.enabledInApp : null);
+        });
     };
 
     const offAuth = client.onAuthStateChange((state) => {
@@ -164,6 +221,8 @@ export function PollarGateway({ children }: { children: ReactNode }) {
         setAddress(null);
         setEmail(null);
         setBalanceUsdc(null);
+        setUsdcTrustline(null);
+        setUsdcEnabledInApp(null);
         return;
       }
       setStatus("authenticating");
@@ -218,6 +277,14 @@ export function PollarGateway({ children }: { children: ReactNode }) {
 
   const saveKey = useCallback((raw: string) => {
     const key = raw.trim();
+    if (/^pat_/.test(key)) {
+      return {
+        ok: false,
+        error:
+          "That is a Pollar personal access token, not a publishable key — the client API refuses it " +
+          "(API_KEY_TYPE_NOT_ALLOWED). Use the pub_testnet_… key from dashboard.pollar.xyz → Build → API Keys.",
+      };
+    }
     if (!apiKeyLooksValid(key)) {
       return {
         ok: false,
@@ -277,6 +344,65 @@ export function PollarGateway({ children }: { children: ReactNode }) {
       .catch(() => setBalanceUsdc(null));
   }, [client]);
 
+  /**
+   * Establishes the wallet's USDC trustline if it doesn't have one.
+   *
+   * Pollar creates the wallet at login and the trustline is a separate step, so
+   * a brand-new member cannot receive USDC until this runs. When the asset is
+   * app-configured the app's funding wallet sponsors the reserve and the fee,
+   * which is why this works for someone holding zero XLM.
+   */
+  const ensureUsdcTrustline = useCallback(async (): Promise<{ ok: boolean; message?: string }> => {
+    if (!client) return { ok: false, message: "No Pollar key configured." };
+    if (!addressRef.current) {
+      return { ok: false, message: "Sign in before paying a contribution." };
+    }
+
+    let info = readUsdcAsset(client);
+    if (!info) {
+      try {
+        await client.refreshAssets();
+      } catch {
+        /* the read below is the authority either way */
+      }
+      info = readUsdcAsset(client);
+    }
+    if (!info) {
+      return {
+        ok: false,
+        message:
+          "USDC is not enabled for this app yet. Add it in the Pollar dashboard under " +
+          "Build → Tokens / Trustlines, then retry.",
+      };
+    }
+    if (info.trustlineEstablished) {
+      setUsdcTrustline(true);
+      return { ok: true };
+    }
+
+    const outcome = await client.setTrustline({
+      code: "USDC",
+      issuer: USDC_ISSUER_ACTIVE,
+    });
+    try {
+      await client.refreshAssets();
+    } catch {
+      /* fall through — we report what the refreshed state says */
+    }
+    const established = Boolean(readUsdcAsset(client)?.trustlineEstablished);
+    setUsdcTrustline(established);
+    if (established || outcome.status === "success" || outcome.status === "pending") {
+      return { ok: true };
+    }
+    return {
+      ok: false,
+      message:
+        outcome.status === "error"
+          ? outcome.details ?? "Could not establish the USDC trustline."
+          : "Could not establish the USDC trustline.",
+    };
+  }, [client]);
+
   const pay = useCallback(
     async (args: PayArgs): Promise<SubmitOutcome> => {
       if (!client) {
@@ -284,6 +410,17 @@ export function PollarGateway({ children }: { children: ReactNode }) {
       }
       if (!addressRef.current) {
         return { status: "error", message: "Sign in before paying a contribution." };
+      }
+      // Read the trustline fresh rather than from state: the member may have
+      // signed in a moment ago and the asset list may not have landed yet.
+      if (!readUsdcAsset(client)?.trustlineEstablished) {
+        const ensured = await ensureUsdcTrustline();
+        if (!ensured.ok) {
+          return {
+            status: "error",
+            message: ensured.message ?? "Could not prepare the USDC trustline.",
+          };
+        }
       }
       const outcome = await client.runTx("payment", {
         destination: args.destination,
@@ -299,7 +436,7 @@ export function PollarGateway({ children }: { children: ReactNode }) {
       }
       return outcome;
     },
-    [client]
+    [client, ensureUsdcTrustline]
   );
 
   const value: PollarContextValue = {
@@ -311,6 +448,8 @@ export function PollarGateway({ children }: { children: ReactNode }) {
     address,
     email,
     balanceUsdc,
+    usdcTrustline,
+    usdcEnabledInApp,
     txPending,
     saveKey,
     clearKey,
@@ -321,6 +460,7 @@ export function PollarGateway({ children }: { children: ReactNode }) {
     cancelLogin,
     signOut,
     refreshBalance,
+    ensureUsdcTrustline,
     pay,
   };
 
