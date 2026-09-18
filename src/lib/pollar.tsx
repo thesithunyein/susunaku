@@ -151,19 +151,40 @@ interface UsdcAssetInfo {
 /**
  * Reads the app's enabled-asset records for USDC.
  *
- * `trustlineEstablished` is the field that decides whether a contribution can
- * land at all: a Stellar wallet cannot receive an asset it holds no trustline
- * for, and a first-time member has never heard the word.
+ * Three outcomes, because two of them are not the same thing and conflating
+ * them produced a lie: when `/wallet/assets` is still in flight or has failed,
+ * the SDK's state is `loading` or `error` — NOT "this app has no USDC". Telling
+ * a member to go configure the dashboard over a transient fetch would send them
+ * chasing a problem that does not exist.
  */
-function readUsdcAsset(client: PollarClient): UsdcAssetInfo | null {
+type UsdcAssetRead =
+  /** The asset list could not be read; we know nothing either way. */
+  | { kind: "unknown"; reason: string }
+  /** Read successfully, and the app configures no USDC record. */
+  | { kind: "absent" }
+  | { kind: "present"; info: UsdcAssetInfo };
+
+function readUsdcAsset(client: PollarClient): UsdcAssetRead {
   let raw: unknown;
   try {
     raw = client.getEnabledAssetsState();
   } catch {
-    return null;
+    return { kind: "unknown", reason: "the SDK could not read its asset state" };
   }
-  const state = raw as { step?: string; data?: { exists?: boolean; assets?: unknown } };
-  if (state?.step !== "loaded" || !state.data) return null;
+  const state = raw as {
+    step?: string;
+    message?: string;
+    data?: { exists?: boolean; assets?: unknown };
+  };
+  if (state?.step === "error") {
+    return {
+      kind: "unknown",
+      reason: state.message ?? "Pollar did not return your asset list",
+    };
+  }
+  if (state?.step !== "loaded" || !state.data) {
+    return { kind: "unknown", reason: `the asset list is still ${state?.step ?? "unavailable"}` };
+  }
   const list = Array.isArray(state.data.assets) ? state.data.assets : [];
   const wanted = USDC_ISSUER_ACTIVE.toUpperCase();
   for (const entry of list) {
@@ -174,13 +195,32 @@ function readUsdcAsset(client: PollarClient): UsdcAssetInfo | null {
     if (code !== "USDC") continue;
     if (issuer && issuer !== wanted) continue;
     return {
-      enabledInApp: record.enabledInApp === undefined ? null : Boolean(record.enabledInApp),
-      trustlineEstablished: Boolean(record.trustlineEstablished),
-      sponsored: record.sponsored === undefined ? null : Boolean(record.sponsored),
-      walletExists: Boolean(state.data.exists),
+      kind: "present",
+      info: {
+        enabledInApp: record.enabledInApp === undefined ? null : Boolean(record.enabledInApp),
+        trustlineEstablished: Boolean(record.trustlineEstablished),
+        sponsored: record.sponsored === undefined ? null : Boolean(record.sponsored),
+        walletExists: Boolean(state.data.exists),
+      },
     };
   }
-  return null;
+  return { kind: "absent" };
+}
+
+/**
+ * Whether a failed submission failed *because the asset is not trusted*.
+ *
+ * Only that specific failure justifies running the (extra, network-round-trip)
+ * trustline step — so we match on the error text rather than optimistically
+ * "preparing" a trustline that the ledger already shows as authorized.
+ */
+function failedOnTrustline(outcome: SubmitOutcome): boolean {
+  if (outcome.status !== "error") return false;
+  return [outcome.message, outcome.details, outcome.resultCode, outcome.code]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase()
+    .includes("trust");
 }
 
 export function PollarGateway({ children }: { children: ReactNode }) {
@@ -245,9 +285,9 @@ export function PollarGateway({ children }: { children: ReactNode }) {
         .refreshAssets()
         .catch(() => undefined)
         .then(() => {
-          const info = readUsdcAsset(client);
-          setUsdcTrustline(info ? info.trustlineEstablished : null);
-          setUsdcEnabledInApp(info ? info.enabledInApp : null);
+          const read = readUsdcAsset(client);
+          setUsdcTrustline(read.kind === "present" ? read.info.trustlineEstablished : null);
+          setUsdcEnabledInApp(read.kind === "present" ? read.info.enabledInApp : null);
         });
     };
 
@@ -416,24 +456,31 @@ export function PollarGateway({ children }: { children: ReactNode }) {
       return { ok: false, message: "Sign in before paying a contribution." };
     }
 
-    let info = readUsdcAsset(client);
-    if (!info) {
+    let read = readUsdcAsset(client);
+    if (read.kind === "unknown") {
+      // The state may simply not have landed yet — ask once before concluding.
       try {
         await client.refreshAssets();
       } catch {
-        /* the read below is the authority either way */
+        /* the re-read below is the authority either way */
       }
-      info = readUsdcAsset(client);
+      read = readUsdcAsset(client);
     }
-    if (!info) {
+    if (read.kind === "unknown") {
+      return {
+        ok: false,
+        message: `Could not read your asset list from Pollar (${read.reason}). Try again in a moment.`,
+      };
+    }
+    if (read.kind === "absent") {
       return {
         ok: false,
         message:
-          "USDC is not enabled for this app yet. Add it in the Pollar dashboard under " +
-          "Build → Tokens / Trustlines, then retry.",
+          "This app configures no USDC asset, so no wallet can hold it. Add USDC in the " +
+          "Pollar dashboard under Build → Tokens / Trustlines, then retry.",
       };
     }
-    if (info.trustlineEstablished) {
+    if (read.info.trustlineEstablished) {
       setUsdcTrustline(true);
       return { ok: true };
     }
@@ -459,7 +506,8 @@ export function PollarGateway({ children }: { children: ReactNode }) {
     } catch {
       /* fall through — the read below is what we report on */
     }
-    const established = Boolean(readUsdcAsset(client)?.trustlineEstablished);
+    const after = readUsdcAsset(client);
+    const established = after.kind === "present" && after.info.trustlineEstablished;
     setUsdcTrustline(established);
     if (established || outcome.status === "success" || outcome.status === "pending") {
       return { ok: true };
@@ -478,9 +526,26 @@ export function PollarGateway({ children }: { children: ReactNode }) {
       if (!addressRef.current) {
         return { status: "error", message: "Sign in before paying a contribution." };
       }
-      // Read the trustline fresh rather than from state: the member may have
-      // signed in a moment ago and the asset list may not have landed yet.
-      if (!readUsdcAsset(client)?.trustlineEstablished) {
+      const submitPayment = () =>
+        client.runTx("payment", {
+          destination: args.destination,
+          amount: args.amount.toFixed(2),
+          asset: {
+            type: "credit_alphanum4",
+            code: "USDC",
+            issuer: USDC_ISSUER_ACTIVE,
+          },
+        });
+
+      // Submit first, and never gate on the SDK's cached asset state.
+      //
+      // Pollar creates the wallet's trustline during login, so normally there is
+      // nothing to prepare. Gating on the cache previously blocked a perfectly
+      // good payment — and reported "USDC is not enabled for this app" — whenever
+      // the asset fetch was still loading or had failed. Only a submission that
+      // actually fails on a missing trustline earns the repair round-trip.
+      let outcome = await submitPayment();
+      if (failedOnTrustline(outcome)) {
         const ensured = await ensureUsdcTrustline();
         if (!ensured.ok) {
           return {
@@ -488,18 +553,11 @@ export function PollarGateway({ children }: { children: ReactNode }) {
             message: ensured.message ?? "Could not prepare the USDC trustline.",
           };
         }
+        outcome = await submitPayment();
       }
-      const outcome = await client.runTx("payment", {
-        destination: args.destination,
-        amount: args.amount.toFixed(2),
-        asset: {
-          type: "credit_alphanum4",
-          code: "USDC",
-          issuer: USDC_ISSUER_ACTIVE,
-        },
-      });
       if (outcome.status === "success" || outcome.status === "pending") {
         setBalanceUsdc(readBalance(client, USDC_ISSUER_ACTIVE));
+        setXlmBalance(readNativeBalance(client));
       }
       return outcome;
     },
