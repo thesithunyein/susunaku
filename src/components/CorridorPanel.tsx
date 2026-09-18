@@ -183,6 +183,9 @@ export function CorridorPanel({ bare = false }: { bare?: boolean } = {}) {
           </div>
         ) : rampCorridors && rampCorridors.length > 0 ? (
           <>
+            {rampCorridorsMessage ? (
+              <div className="note note-info tiny">{rampCorridorsMessage}</div>
+            ) : null}
             <p className="tiny muted">
               Live for this app:{" "}
               {rampCorridors

@@ -573,23 +573,47 @@ export function PollarGateway({ children }: { children: ReactNode }) {
     if (!client) return;
     setRampCorridorsStatus("loading");
     setRampCorridorsMessage(null);
+    // Live discovery asks the backend which corridors it can execute. That
+    // endpoint refuses publishable keys (API_KEY_TYPE_NOT_ALLOWED) — it is an
+    // operator-dashboard capability — and in the browser the request can also
+    // stall rather than settle. Either way, the honest fallback is the same:
+    // show Pollar's documented ramp list, labelled as such, and never leave a
+    // member on a spinner.
+    const documentedFallback = (): RampCorridor[] => [
+      { code: "BO", currency: "BOB" },
+      { code: "BR", currency: "BRL" },
+      { code: "CO", currency: "COP" },
+      { code: "MX", currency: "MXN" },
+    ];
     try {
-      const content = (await client.getRampCountries()) as {
-        countries?: { code?: string; currency?: string | null }[];
-      };
-      const list = Array.isArray(content?.countries) ? content.countries : [];
-      setRampCorridors(
-        list.map((entry) => ({
-          code: String(entry.code ?? ""),
-          currency: entry.currency ?? null,
-        }))
-      );
+      const content = (await Promise.race([
+        client.getRampCountries() as Promise<{
+          countries?: { code?: string; currency?: string | null }[];
+        }>,
+        new Promise<null>((resolve) => window.setTimeout(() => resolve(null), 8000)),
+      ])) as { countries?: { code?: string; currency?: string | null }[] } | null;
+      const list = Array.isArray(content?.countries) ? content!.countries! : null;
+      if (list) {
+        setRampCorridors(
+          list.map((entry) => ({
+            code: String(entry.code ?? ""),
+            currency: entry.currency ?? null,
+          }))
+        );
+        setRampCorridorsStatus("loaded");
+        return;
+      }
+      // Timed out or empty: documented list, plainly labelled.
+      setRampCorridors(documentedFallback());
       setRampCorridorsStatus("loaded");
-    } catch (err) {
-      setRampCorridors(null);
-      setRampCorridorsStatus("error");
       setRampCorridorsMessage(
-        err instanceof Error ? err.message : "Could not read this app's ramp corridors."
+        "Live corridor discovery needs an operator key, so this is Pollar's documented ramp list rather than a live read."
+      );
+    } catch (err) {
+      setRampCorridors(documentedFallback());
+      setRampCorridorsStatus("loaded");
+      setRampCorridorsMessage(
+        `Live corridor discovery is not available to a publishable key (${err instanceof Error ? err.message : "request failed"}), so this is Pollar's documented ramp list.`
       );
     }
   }, [client]);
