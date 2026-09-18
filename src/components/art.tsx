@@ -1,35 +1,86 @@
-/** Chunky SVG props in the reference's voxel-ish, chunky-rounded style. */
-
-export function Mark({ size = 30 }: { size?: number }) {
+/**
+ * Chunky SVG props in the reference's voxel-ish, chunky-rounded style.
+ *
+ * The mark is three members and one coin: three fat rounded bars lying on a
+ * ring, with a gold coin travelling around them. The middle is deliberately
+ * empty — that is the product. The coin orbits and its face stays upright (a
+ * counter-rotation), and the eye blinks now and then so the mark reads as alive
+ * rather than as a spinner. Both are CSS-only so `prefers-reduced-motion` can
+ * stop them like any other animation.
+ *
+ * Ring geometry: r = 20, so the circumference is 125.6637. A dash of 32.5 and a
+ * gap of 93.1637 is exactly one revolution, and stepping the offset by 41.8879
+ * (120°) places the three members.
+ */
+export function Mark({ size = 30, animated = true }: { size?: number; animated?: boolean }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
-      <circle cx="32" cy="32" r="30" fill="#0B0B0C" />
-      <circle cx="32" cy="32" r="24" fill="#FAF6EF" />
-      {/* Members arranged around the ring — note the gap: nothing closes the circle. */}
-      <rect x="42" y="12" width="11" height="11" rx="3.2" fill="#4A54E1" />
-      <rect x="12" y="16" width="11" height="11" rx="3.2" fill="#E5432C" />
-      <rect x="8" y="34" width="11" height="11" rx="3.2" fill="#2FA84F" />
-      <rect x="20" y="46" width="11" height="11" rx="3.2" fill="#F5C33B" />
-      <rect x="38" y="44" width="11" height="11" rx="3.2" fill="#7B4FBF" />
-      {/* The frame in the middle is not a container. */}
-      <circle cx="32" cy="32" r="12" fill="#fff" stroke="#0B0B0C" strokeWidth="2.5" />
-      <circle cx="32" cy="32" r="12" fill="none" stroke="#0B0B0C" strokeWidth="2.5" strokeDasharray="5 7" />
-      <text
-        x="32"
-        y="38.5"
-        textAnchor="middle"
-        fontFamily="Inter, sans-serif"
-        fontWeight="800"
-        fontSize="17"
-        fill="#0B0B0C"
-      >
-        $
-      </text>
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 64 64"
+      aria-hidden="true"
+      className={animated ? "susu-logo" : undefined}
+    >
+      <defs>
+        <linearGradient id="susuCoinFace" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FFD978" />
+          <stop offset="100%" stopColor="#D9A520" />
+        </linearGradient>
+      </defs>
+
+      {[
+        { color: "#4A54E1", offset: 0 },
+        { color: "#D9A520", offset: -41.8879 },
+        { color: "#2FA84F", offset: -83.7758 },
+      ].map((member) => (
+        <g key={member.offset} fill="none" strokeLinecap="round">
+          <circle
+            cx="32"
+            cy="32"
+            r="20"
+            stroke="#0B0B0C"
+            strokeWidth="11"
+            strokeDasharray="32.5 93.1637"
+            strokeDashoffset={member.offset}
+          />
+          <circle
+            cx="32"
+            cy="32"
+            r="20"
+            stroke={member.color}
+            strokeWidth="6.4"
+            strokeDasharray="32.5 93.1637"
+            strokeDashoffset={member.offset}
+          />
+        </g>
+      ))}
+
+      <g className="susu-orbit">
+        <g className="susu-coin">
+          <circle
+            cx="32"
+            cy="12"
+            r="9"
+            fill="url(#susuCoinFace)"
+            stroke="#0B0B0C"
+            strokeWidth="2.8"
+          />
+          <circle className="susu-eye" cx="29.3" cy="10.4" r="1.7" fill="#0B0B0C" />
+          <circle className="susu-eye" cx="34.7" cy="10.4" r="1.7" fill="#0B0B0C" />
+          <path
+            d="M28.8 13.9 Q32 17.1 35.2 13.9"
+            fill="none"
+            stroke="#0B0B0C"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
+        </g>
+      </g>
     </svg>
   );
 }
 
-export function Lockup({ size = 30 }: { size?: number }) {
+export function Lockup({ size = 32 }: { size?: number }) {
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
       <Mark size={size} />

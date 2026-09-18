@@ -1,13 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="susuCoinFace" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFD978" />
+      <stop offset="100%" stop-color="#D9A520" />
+    </linearGradient>
+  </defs>
+
   <rect width="64" height="64" rx="14" fill="#FAF6EF" />
-  <g transform="translate(6 6) scale(0.8125)">
-    <circle cx="32" cy="32" r="28" fill="#FFFFFF" />
-    <rect x="42" y="12" width="11" height="11" rx="3.2" fill="#4A54E1" />
-    <rect x="12" y="16" width="11" height="11" rx="3.2" fill="#E5432C" />
-    <rect x="8" y="34" width="11" height="11" rx="3.2" fill="#2FA84F" />
-    <rect x="20" y="46" width="11" height="11" rx="3.2" fill="#F5C33B" />
-    <rect x="38" y="44" width="11" height="11" rx="3.2" fill="#7B4FBF" />
-    <circle cx="32" cy="32" r="11" fill="#FAF6EF" stroke="#0B0B0C" stroke-width="2.5" />
-    <text x="32" y="38" text-anchor="middle" font-family="Inter, Helvetica, Arial, sans-serif" font-weight="800" font-size="16" fill="#0B0B0C">$</text>
+
+  <g transform="translate(4 4) scale(0.875)">
+    <g fill="none" stroke-linecap="round">
+      <circle cx="32" cy="32" r="20" stroke="#0B0B0C" stroke-width="11" stroke-dasharray="32.5 93.1637" />
+      <circle cx="32" cy="32" r="20" stroke="#4A54E1" stroke-width="6.4" stroke-dasharray="32.5 93.1637" />
+      <circle cx="32" cy="32" r="20" stroke="#0B0B0C" stroke-width="11" stroke-dasharray="32.5 93.1637" stroke-dashoffset="-41.8879" />
+      <circle cx="32" cy="32" r="20" stroke="#D9A520" stroke-width="6.4" stroke-dasharray="32.5 93.1637" stroke-dashoffset="-41.8879" />
+      <circle cx="32" cy="32" r="20" stroke="#0B0B0C" stroke-width="11" stroke-dasharray="32.5 93.1637" stroke-dashoffset="-83.7758" />
+      <circle cx="32" cy="32" r="20" stroke="#2FA84F" stroke-width="6.4" stroke-dasharray="32.5 93.1637" stroke-dashoffset="-83.7758" />
+    </g>
+    <circle cx="32" cy="12" r="9" fill="url(#susuCoinFace)" stroke="#0B0B0C" stroke-width="2.8" />
+    <circle cx="29.3" cy="10.4" r="1.7" fill="#0B0B0C" />
+    <circle cx="34.7" cy="10.4" r="1.7" fill="#0B0B0C" />
+    <path d="M28.8 13.9 Q32 17.1 35.2 13.9" fill="none" stroke="#0B0B0C" stroke-width="1.8" stroke-linecap="round" />
   </g>
 </svg>

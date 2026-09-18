@@ -1,17 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="140" viewBox="0 0 640 140" role="img" aria-label="Susunaku">
-  <rect width="640" height="140" fill="none" />
-  <g transform="translate(8 18) scale(1.55)">
-    <circle cx="32" cy="32" r="30" fill="#0B0B0C" />
-    <circle cx="32" cy="32" r="24" fill="#FAF6EF" />
-    <rect x="42" y="12" width="11" height="11" rx="3.2" fill="#4A54E1" />
-    <rect x="12" y="16" width="11" height="11" rx="3.2" fill="#E5432C" />
-    <rect x="8" y="34" width="11" height="11" rx="3.2" fill="#2FA84F" />
-    <rect x="20" y="46" width="11" height="11" rx="3.2" fill="#F5C33B" />
-    <rect x="38" y="44" width="11" height="11" rx="3.2" fill="#7B4FBF" />
-    <circle cx="32" cy="32" r="12" fill="#FFFFFF" stroke="#0B0B0C" stroke-width="2.5" />
-    <circle cx="32" cy="32" r="12" fill="none" stroke="#0B0B0C" stroke-width="2.5" stroke-dasharray="5 7" />
-    <text x="32" y="38.5" text-anchor="middle" font-family="Inter, Helvetica, Arial, sans-serif" font-weight="800" font-size="17" fill="#0B0B0C">$</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="140" viewBox="0 0 640 140" role="img" aria-label="Susunaku — savings circles with no pot to steal">
+  <title>Susunaku</title>
+  <defs>
+    <linearGradient id="susuCoinFace" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFD978" />
+      <stop offset="100%" stop-color="#D9A520" />
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(18 20) scale(1.55)">
+    <g fill="none" stroke-linecap="round">
+      <circle cx="32" cy="32" r="20" stroke="#0B0B0C" stroke-width="11" stroke-dasharray="32.5 93.1637" />
+      <circle cx="32" cy="32" r="20" stroke="#4A54E1" stroke-width="6.4" stroke-dasharray="32.5 93.1637" />
+      <circle cx="32" cy="32" r="20" stroke="#0B0B0C" stroke-width="11" stroke-dasharray="32.5 93.1637" stroke-dashoffset="-41.8879" />
+      <circle cx="32" cy="32" r="20" stroke="#D9A520" stroke-width="6.4" stroke-dasharray="32.5 93.1637" stroke-dashoffset="-41.8879" />
+      <circle cx="32" cy="32" r="20" stroke="#0B0B0C" stroke-width="11" stroke-dasharray="32.5 93.1637" stroke-dashoffset="-83.7758" />
+      <circle cx="32" cy="32" r="20" stroke="#2FA84F" stroke-width="6.4" stroke-dasharray="32.5 93.1637" stroke-dashoffset="-83.7758" />
+    </g>
+    <circle cx="32" cy="12" r="9" fill="url(#susuCoinFace)" stroke="#0B0B0C" stroke-width="2.8" />
+    <circle cx="29.3" cy="10.4" r="1.7" fill="#0B0B0C" />
+    <circle cx="34.7" cy="10.4" r="1.7" fill="#0B0B0C" />
+    <path d="M28.8 13.9 Q32 17.1 35.2 13.9" fill="none" stroke="#0B0B0C" stroke-width="1.8" stroke-linecap="round" />
   </g>
-  <text x="122" y="72" font-family="Inter, Helvetica, Arial, sans-serif" font-weight="800" font-size="46" letter-spacing="-1.4" fill="#0B0B0C">Susunaku</text>
-  <text x="124" y="100" font-family="Inter, Helvetica, Arial, sans-serif" font-weight="600" font-size="17" fill="#57575F">savings circles with no pot to steal</text>
+
+  <text x="137" y="70" font-family="Inter, Helvetica, Arial, sans-serif" font-weight="800" font-size="46" letter-spacing="-1.4" fill="#0B0B0C">Susunaku</text>
+  <text x="139" y="98" font-family="Inter, Helvetica, Arial, sans-serif" font-weight="600" font-size="17" fill="#57575F">savings circles with no pot to steal</text>
 </svg>

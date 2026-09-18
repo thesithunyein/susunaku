@@ -34,10 +34,62 @@
   justify-self: start;
 }
 
+/* Hovering the lockup nudges the whole mark — the coin keeps its own orbit. */
+.brand svg {
+  transition: transform 0.18s ease;
+}
+
+.brand:hover svg,
+.brand:focus-visible svg {
+  transform: scale(1.07);
+}
+
 .brand-name {
   font-weight: 800;
   font-size: 21px;
   letter-spacing: -0.02em;
+}
+
+/* The coin travels the ring; the counter-rotation keeps its face upright. */
+.susu-orbit {
+  transform-box: view-box;
+  transform-origin: 32px 32px;
+  animation: logo-orbit 7.5s linear infinite;
+}
+
+.susu-coin {
+  transform-box: view-box;
+  transform-origin: 32px 12px;
+  animation: logo-counter 7.5s linear infinite;
+}
+
+.susu-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: logo-blink 5.6s infinite;
+}
+
+@keyframes logo-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes logo-counter {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes logo-blink {
+  0%,
+  91%,
+  100% {
+    transform: scaleY(1);
+  }
+  94% {
+    transform: scaleY(0.12);
+  }
 }
 
 .topbar-right {
