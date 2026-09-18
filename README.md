@@ -205,6 +205,12 @@ Working now: non-custodial wallets behind an email login; real USDC contribution
 member's own wallet; round confirmation from Horizon with explorer receipts; circles shared
 entirely by link; and a money-in/money-out panel that reads its corridors from the SDK.
 
+Signed out, the app is *empty* rather than populated with someone else's data: no placeholder
+stats, no account panels for an account the visitor does not have, and starting a circle asks for
+an account first — because a circle is built from the creator's own wallet address. The one path
+that deliberately needs no account is an invite link: the whole circle travels in the URL, so an
+invited member sees the live round and is asked to sign in only to pay.
+
 Not solved yet, and stated plainly:
 
 - **Default risk.** If a member never pays, the recipient is short that round. The chain makes the

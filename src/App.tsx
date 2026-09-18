@@ -68,17 +68,18 @@ export default function App() {
 
   const activeCircle = useMemo(() => {
     if (route.name !== "home") return undefined;
-    return route.circleId ? circles.find((c) => c.id === route.circleId) : circles[0];
-  }, [route, circles]);
+    // An explicit circle in the URL is an invite: show its clock even signed out.
+    if (route.circleId) return circles.find((c) => c.id === route.circleId);
+    // Signed out, the page is an empty state — a stored circle's clock would be
+    // a timer for something the visitor cannot see or act on.
+    if (!pollar.address) return undefined;
+    return circles[0];
+  }, [route, circles, pollar.address]);
 
   const pill = useMemo(() => {
-    if (!activeCircle) {
-      return (
-        <CountdownPill>
-          <span className="cd-label">Circle</span> <strong>none yet</strong>
-        </CountdownPill>
-      );
-    }
+    // No circle means no clock. A "none yet" pill is chrome for a thing that
+    // does not exist, and the empty page says that better on its own.
+    if (!activeCircle) return null;
     const round = currentRound(activeCircle, now);
     const window_ = roundWindow(activeCircle, round);
     const left = Math.max(0, window_.end - now);

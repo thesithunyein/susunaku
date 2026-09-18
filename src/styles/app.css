@@ -201,6 +201,11 @@
   z-index: 2;
 }
 
+/* An empty page should look deliberate, not like a page that failed to load. */
+.hero-empty {
+  padding: 9vh 0 4vh;
+}
+
 .kicker {
   font-size: 16px;
   font-weight: 600;

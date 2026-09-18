@@ -17,6 +17,7 @@ import { circleShareUrl } from "../lib/share";
 import { upsertCircle } from "../lib/store";
 import { IconPlus } from "../components/icons";
 import { Disclosure } from "../components/Disclosure";
+import { KeyForm, SignInPanel } from "../components/AuthPanel";
 
 interface DraftMember {
   key: string;
@@ -29,7 +30,7 @@ function emptyDraft(): DraftMember {
   return { key: newMemberId(), name: "", country: "", address: "" };
 }
 
-export function CreateCircle() {
+function NewCircleForm() {
   const { address, hasKey } = usePollar();
   const [name, setName] = useState("Family circle");
   const [amount, setAmount] = useState("10");
@@ -304,4 +305,32 @@ export function CreateCircle() {
       </div>
     </div>
   );
+}
+
+/**
+ * A circle is built out of the creator's own wallet address, so it needs an
+ * account before it needs a form. Signed out this page is a sign-in rather than
+ * a form that cannot be submitted, and the signed-in branch is the only one
+ * that mounts the fields.
+ */
+export function CreateCircle() {
+  const { address, hasKey } = usePollar();
+
+  if (!address) {
+    return (
+      <div className="wrap" style={{ maxWidth: 560 }}>
+        <h1 className="display display-sm">Start a circle</h1>
+        <p className="hero-sub">
+          A circle is built from your wallet address, so this needs an account first. One email
+          code, no password — Pollar creates the wallet.
+        </p>
+        <div className="card">{hasKey ? <SignInPanel /> : <KeyForm />}</div>
+        <p className="tiny muted" style={{ marginTop: 14 }}>
+          Invited to a circle? That link needs no account — open it and the round shows.
+        </p>
+      </div>
+    );
+  }
+
+  return <NewCircleForm />;
 }

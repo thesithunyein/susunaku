@@ -25,6 +25,7 @@ import {
   IconCheck,
   IconCopy,
   IconExternal,
+  IconPlus,
   IconRefresh,
   IconSend,
   IconUser,
@@ -90,16 +91,49 @@ export function Home({
   );
   const [copied, setCopied] = useState(false);
 
+  // An invite link is the one thing that has to work without an account: the
+  // whole circle travels in the URL, so we can honestly show it. Anything else
+  // signed out is an empty product — no placeholder stats, no account panels
+  // for an account nobody has.
+  const fromInvite = Boolean(circleId);
+
+  if (!pollar.address && !fromInvite) {
+    return (
+      <section className="hero hero-empty">
+        <div className="kicker">Savings circles on Stellar</div>
+        <h1 className="display display-sm">No circles yet</h1>
+        <p className="hero-sub">
+          Members pay each other directly in USDC, so there is no pot and nobody holding it. Sign
+          in and your circles live here.
+        </p>
+        <div className="cta-row">
+          <button type="button" className="btn btn-primary" onClick={openAuth}>
+            <IconUser size={18} /> Sign in
+          </button>
+          <a className="btn btn-ghost" href="#/how">
+            How it works
+          </a>
+          <span className="marker" />
+        </div>
+      </section>
+    );
+  }
+
   if (!circle) {
     return (
       <>
         <section className="hero">
-          <div className="kicker">Savings circles on Stellar</div>
-          <h1 className="display">$0.00</h1>
-          <p className="hero-sub">How much of your money we hold. It stays that way.</p>
+          <div className="kicker">No circle on this device</div>
+          <h1 className="display display-sm">No circles yet</h1>
+          <p className="hero-sub">
+            Start one and it opens here — amount, cadence, members, rotation order.
+          </p>
           <div className="cta-row">
             <a className="btn btn-primary" href="#/new">
-              Start a circle
+              <IconPlus size={18} /> Start a circle
+            </a>
+            <a className="btn btn-ghost" href="#/how">
+              How it works
             </a>
             <span className="marker" />
           </div>
@@ -151,19 +185,23 @@ export function Home({
 
             <div className="stack">
               <Disclosure
-                title={pollar.hasKey ? "Your wallet" : "Connect Pollar"}
+                title={pollar.address ? "Your wallet" : "Sign in"}
                 summary={
                   pollar.address
                     ? shortAddr(pollar.address, 4)
-                    : "email only · no seed phrase"
+                    : pollar.hasKey
+                      ? "email code · no seed phrase"
+                      : "connect Pollar first"
                 }
                 defaultOpen={!circle}
               >
                 {pollar.hasKey ? <SignInPanel /> : <KeyForm />}
               </Disclosure>
-              <Disclosure title="Money in and out" summary="fund a seat · cash out a round">
-                <CorridorPanel bare />
-              </Disclosure>
+              {pollar.address ? (
+                <Disclosure title="Money in and out" summary="fund a seat · cash out a round">
+                  <CorridorPanel bare />
+                </Disclosure>
+              ) : null}
             </div>
           </div>
         </div>
@@ -527,21 +565,25 @@ export function Home({
               </button>
             </Disclosure>
 
-            <Disclosure
-              title="Money in and out"
-              summary="fund a seat, or cash out a round"
-            >
-              <CorridorPanel bare />
-            </Disclosure>
+            {/* Rails belong to an account. Signed out there is nothing to show,
+                so the row is absent rather than opening onto an apology. */}
+            {pollar.address ? (
+              <Disclosure
+                title="Money in and out"
+                summary="fund a seat, or cash out a round"
+              >
+                <CorridorPanel bare />
+              </Disclosure>
+            ) : null}
 
             <Disclosure
-              title="Your wallet"
+              title={pollar.address ? "Your wallet" : "Sign in"}
               summary={
-                pollar.hasKey
-                  ? pollar.address
-                    ? shortAddr(pollar.address, 4)
-                    : "not signed in"
-                  : "no key connected"
+                pollar.address
+                  ? shortAddr(pollar.address, 4)
+                  : pollar.hasKey
+                    ? "email code · no seed phrase"
+                    : "connect Pollar first"
               }
             >
               {pollar.hasKey ? <SignInPanel /> : <KeyForm />}
