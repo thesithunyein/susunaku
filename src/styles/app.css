@@ -281,14 +281,37 @@
 
 /* ============================ Mascot ============================ */
 
+/* First screen of an empty page: hero text, then the mascot flexing to fill
+   every pixel that remains — so the big boy is on screen on arrival, not a
+   head peeking over the fold. */
+.empty-first {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100svh - 126px); /* shell padding top + bottom + topbar */
+}
+
+.empty-first .hero-empty {
+  padding-top: clamp(10px, 3vh, 40px);
+  flex: none;
+}
+
+.empty-first .toy-stage {
+  flex: 1 1 auto;
+  min-height: 260px;
+  height: auto;
+  margin-top: clamp(4px, 1.5vh, 14px);
+}
+
 /* The empty page's resident: a big lavender character whose recorded pupils
    follow the cursor (HeroToy scrubs the frame). Its background is the same
    #f0eefa as the canvas, so it sits in the page with no frame around it. */
 .toy-stage {
   position: relative;
   z-index: 1;
-  margin: clamp(6px, 2vh, 22px) -28px 0;
-  width: calc(100% + 56px);
+  /* Full bleed on phones and laptops; capped past 1500px so the cover-zoom
+     never crops the character down to a slice of face on huge monitors. */
+  width: min(calc(100% + 56px), 1500px);
+  margin: clamp(6px, 2vh, 22px) auto 0;
   height: clamp(300px, 42vw, 600px);
   overflow: hidden;
   pointer-events: none;

@@ -164,23 +164,28 @@ export function Home({
   if (!pollar.address && !fromInvite) {
     return (
       <>
-        <section className="hero hero-empty">
-          <div className="kicker">Savings circles on Stellar</div>
-          <h1 className="display display-sm">No circles yet</h1>
-          <p className="hero-sub">
-            Members pay each other directly in USDC, so there is no pot and nobody holding it.
-          </p>
-          <div className="cta-row">
-            <button type="button" className="btn btn-primary" onClick={openAuth}>
-              <IconUser size={18} /> Sign in
-            </button>
-            <a className="btn btn-ghost" href="#/how">
-              How it works
-            </a>
-          </div>
-        </section>
+        {/* Hero + mascot are one viewport-filling column: the toy flexes to
+            exactly the space left in the first screen, so he is never a head
+            peeking over the fold. */}
+        <div className="empty-first">
+          <section className="hero hero-empty">
+            <div className="kicker">Savings circles on Stellar</div>
+            <h1 className="display display-sm">No circles yet</h1>
+            <p className="hero-sub">
+              Members pay each other directly in USDC, so there is no pot and nobody holding it.
+            </p>
+            <div className="cta-row">
+              <button type="button" className="btn btn-primary" onClick={openAuth}>
+                <IconUser size={18} /> Sign in
+              </button>
+              <a className="btn btn-ghost" href="#/how">
+                How it works
+              </a>
+            </div>
+          </section>
 
-        <HeroToy />
+          <HeroToy />
+        </div>
 
         {/* An account is empty. The page is not: with no data to show, it shows
             the product — three steps and what actually changes. */}
@@ -196,23 +201,25 @@ export function Home({
   if (!circle) {
     return (
       <>
-        <section className="hero hero-empty">
-          <div className="kicker">No circle on this device</div>
-          <h1 className="display display-sm">No circles yet</h1>
-          <p className="hero-sub">
-            Start one and it opens here — amount, cadence, members, rotation order.
-          </p>
-          <div className="cta-row">
-            <a className="btn btn-primary" href="#/new">
-              <IconPlus size={18} /> Start a circle
-            </a>
-            <a className="btn btn-ghost" href="#/how">
-              How it works
-            </a>
-          </div>
-        </section>
+        <div className="empty-first">
+          <section className="hero hero-empty">
+            <div className="kicker">No circle on this device</div>
+            <h1 className="display display-sm">No circles yet</h1>
+            <p className="hero-sub">
+              Start one and it opens here — amount, cadence, members, rotation order.
+            </p>
+            <div className="cta-row">
+              <a className="btn btn-primary" href="#/new">
+                <IconPlus size={18} /> Start a circle
+              </a>
+              <a className="btn btn-ghost" href="#/how">
+                How it works
+              </a>
+            </div>
+          </section>
 
-        <HeroToy />
+          <HeroToy />
+        </div>
 
         <div className="wrap">
           <div className="stack" style={{ marginTop: 30 }}>
