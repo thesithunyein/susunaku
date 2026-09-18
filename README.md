@@ -185,6 +185,9 @@ Nothing in that diagram is a server we run: the app is a static bundle, the wall
 member's own, the record is the ledger, and the directory is the link itself.
 
 ### Source map
+
+```
+src/
   lib/
     config.ts          network, USDC issuers, Horizon + explorer URLs, key storage
     circle.ts          circle model, cadences, round maths, velocity maths
