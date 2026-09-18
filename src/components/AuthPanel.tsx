@@ -3,6 +3,7 @@ import { usePollar } from "../lib/pollar";
 import { shortAddr } from "../lib/format";
 import { NETWORK, USDC_ISSUER_ACTIVE } from "../lib/config";
 import { fmtUsdcDisplay } from "../lib/format";
+import { GoogleMark, IconCopy, IconRefresh } from "./icons";
 
 const STEP_COPY: Record<string, string> = {
   creating_session: "Opening a session…",
@@ -104,6 +105,7 @@ export function SignInPanel() {
   const [code, setCode] = useState("");
   const [trustMsg, setTrustMsg] = useState<string | null>(null);
   const [mailError, setMailError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   /** Guards against sending the code twice for the same `entering_email` step. */
   const autoSentRef = useRef(false);
 
@@ -126,24 +128,35 @@ export function SignInPanel() {
     return (
       <div className="stack">
         <div className="note note-good">
-          Signed in{email ? ` as ${email}` : ""} — your own non-custodial Stellar wallet.
+          Signed in{email ? ` as ${email}` : ""}. This wallet is yours — we never hold it.
         </div>
+
         <div className="lcd">
-          <div className="lcd-label">Your wallet · {NETWORK}</div>
-          <div className="lcd-value" style={{ fontSize: 15, wordBreak: "break-all" }}>
-            {shortAddr(address, 8)}
-          </div>
-          <div className="lcd-sub">USDC balance</div>
-          <div className="lcd-value">{fmtUsdcDisplay(balanceUsdc)}</div>
-          <div className="lcd-sub">USDC trustline</div>
-          <div className="lcd-value" style={{ fontSize: 15 }}>
-            {usdcTrustline === null
-              ? "checking…"
-              : usdcTrustline
-                ? "established"
-                : "missing"}
+          <div className="lcd-label">Balance</div>
+          <div className="lcd-value">{fmtUsdcDisplay(balanceUsdc)} USDC</div>
+          <div className="lcd-sub">
+            {shortAddr(address, 8)} · {NETWORK}
           </div>
         </div>
+
+        {/* Only the unhappy path earns a banner. A working trustline is not news. */}
+        {usdcTrustline === false ? (
+          <div className="note note-warn">
+            No USDC trustline on this wallet yet, so it cannot hold USDC.{" "}
+            <button
+              type="button"
+              className="link"
+              onClick={() => {
+                setTrustMsg("Preparing the USDC trustline…");
+                void ensureUsdcTrustline().then((result) =>
+                  setTrustMsg(result.ok ? "USDC trustline ready." : result.message ?? "Failed.")
+                );
+              }}
+            >
+              Prepare it now
+            </button>
+          </div>
+        ) : null}
         {usdcEnabledInApp === false ? (
           <div className="note note-warn">
             USDC is not enabled for this app yet — add it in the Pollar dashboard under Build →
@@ -151,21 +164,26 @@ export function SignInPanel() {
           </div>
         ) : null}
         {trustMsg ? <div className="note note-info">{trustMsg}</div> : null}
-        <div className="cta-row" style={{ flexDirection: "row", gap: 10, justifyContent: "center" }}>
-          <button type="button" className="btn btn-ghost btn-sm" onClick={refreshBalance}>
-            Refresh balance
-          </button>
+
+        <div className="cta-row cta-wrap">
           <button
             type="button"
             className="btn btn-ghost btn-sm"
             onClick={() => {
-              setTrustMsg("Preparing the USDC trustline…");
-              void ensureUsdcTrustline().then((result) =>
-                setTrustMsg(result.ok ? "USDC trustline ready." : result.message ?? "Failed.")
+              void navigator.clipboard?.writeText(address).then(
+                () => {
+                  setCopied(true);
+                  window.setTimeout(() => setCopied(false), 2000);
+                },
+                () => setCopied(false)
               );
             }}
           >
-            Prepare USDC
+            <IconCopy size={15} />
+            {copied ? "Copied" : "Copy address"}
+          </button>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={refreshBalance}>
+            <IconRefresh size={15} /> Refresh
           </button>
           <button type="button" className="btn btn-ghost btn-sm" onClick={signOut}>
             Sign out
@@ -254,7 +272,7 @@ export function SignInPanel() {
       {authMessage ? <div className="note note-bad">{authMessage}</div> : null}
       {mailError ? <div className="note note-bad">{mailError}</div> : null}
       <button type="button" className="btn btn-primary btn-block" onClick={loginGoogle}>
-        🔵 Continue with Google
+        <GoogleMark size={18} /> Continue with Google
       </button>
       <div className="center tiny muted">or</div>
       <form

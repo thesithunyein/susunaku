@@ -21,7 +21,6 @@ export interface CorridorLeg {
   id: string;
   /** Where the person is. */
   country: string;
-  flag: string;
   fiat: string;
   /** The local rail the person actually touches. */
   rail: string;
@@ -39,7 +38,6 @@ export const LATAM_LEGS: CorridorLeg[] = [
   {
     id: "bo-bob",
     country: "Bolivia",
-    flag: "🇧🇴",
     fiat: "BOB",
     rail: "Bank QR (buy) · ACH (sell)",
     direction: "both",
@@ -51,7 +49,6 @@ export const LATAM_LEGS: CorridorLeg[] = [
   {
     id: "br-pix-bridge",
     country: "Brazil",
-    flag: "🇧🇷",
     fiat: "BRL",
     rail: "Pix",
     direction: "both",
@@ -62,7 +59,6 @@ export const LATAM_LEGS: CorridorLeg[] = [
   {
     id: "br-pix-pag",
     country: "Brazil",
-    flag: "🇧🇷",
     fiat: "BRL",
     rail: "Pix",
     direction: "in",
@@ -74,7 +70,6 @@ export const LATAM_LEGS: CorridorLeg[] = [
   {
     id: "br-co-abroad",
     country: "Brazil · Colombia",
-    flag: "🇧🇷🇨🇴",
     fiat: "BRL · COP",
     rail: "Pix · BreB",
     direction: "out",
@@ -85,7 +80,6 @@ export const LATAM_LEGS: CorridorLeg[] = [
   {
     id: "mx-spei",
     country: "Mexico",
-    flag: "🇲🇽",
     fiat: "MXN",
     rail: "SPEI",
     direction: "both",
@@ -96,7 +90,6 @@ export const LATAM_LEGS: CorridorLeg[] = [
   {
     id: "anclap",
     country: "Any SEP-24 anchor",
-    flag: "🌎",
     fiat: "local",
     rail: "SEP-24",
     direction: "both",
@@ -124,7 +117,6 @@ export const AFRICAN_LEGS: CorridorLeg[] = [
   {
     id: "af-momo-partner",
     country: "Kenya · Ghana · Nigeria · Senegal · Zambia +",
-    flag: "🌍",
     fiat: "KES · GHS · NGN · XOF · ZMW",
     rail: "M-Pesa · MTN MoMo · Airtel Money · bank transfer",
     direction: "both",
@@ -136,7 +128,6 @@ export const AFRICAN_LEGS: CorridorLeg[] = [
   {
     id: "af-momo-partner-2",
     country: "20 African markets",
-    flag: "🌍",
     fiat: "local",
     rail: "Mobile money · bank collection",
     direction: "both",
@@ -147,7 +138,6 @@ export const AFRICAN_LEGS: CorridorLeg[] = [
   {
     id: "af-semi-manual",
     country: "Any African market",
-    flag: "🤝",
     fiat: "local cash",
     rail: "Agent · P2P float",
     direction: "both",

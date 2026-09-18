@@ -9,6 +9,7 @@ import {
 } from "../lib/corridor";
 import { fmtUsdcDisplay } from "../lib/format";
 import { NETWORK } from "../lib/config";
+import { IconCheck, IconCopy, IconSpark } from "./icons";
 
 /**
  * A member's rails, not the operator's dashboard.
@@ -25,11 +26,12 @@ function LegRow({ leg }: { leg: CorridorLeg }) {
     leg.direction === "both" ? "money in and out" : leg.direction === "in" ? "money in" : "money out";
   return (
     <div className="member">
+      {/* The fiat code, not a flag: flag emoji do not render at all on Windows. */}
       <div
         className="member-avatar"
         style={{ background: live ? "var(--green)" : "var(--muted-2)" }}
       >
-        {leg.flag}
+        {leg.fiat.split("·")[0].trim().slice(0, 3).toUpperCase()}
       </div>
       <div>
         <div className="member-name">
@@ -49,7 +51,7 @@ function LegRow({ leg }: { leg: CorridorLeg }) {
   );
 }
 
-export function CorridorPanel() {
+export function CorridorPanel({ bare = false }: { bare?: boolean } = {}) {
   const {
     address,
     balanceUsdc,
@@ -73,7 +75,26 @@ export function CorridorPanel() {
     if (address) loadRampCorridors();
   }, [address, loadRampCorridors]);
 
-  if (!address) return null;
+  // Never hand a caller an empty panel: a disclosure that opens onto nothing
+  // reads as a bug. Say what is missing and what would show it.
+  if (!address) {
+    const empty = (
+      <p className="tiny muted" style={{ margin: 0 }}>
+        Sign in and this fills in with your own rails — where your money can come from, and where a
+        round can be cashed out.
+      </p>
+    );
+    return bare ? (
+      empty
+    ) : (
+      <div className="card">
+        <div className="card-head">
+          <span className="card-title">Money in and out</span>
+        </div>
+        {empty}
+      </div>
+    );
+  }
 
   const corridor = rampCorridors?.[0];
   const amountNumber = Number(amount);
@@ -101,20 +122,22 @@ export function CorridorPanel() {
     }
   };
 
-  return (
-    <div className="card">
-      <div className="card-head">
-        <span className="card-title">Money in and out</span>
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm"
-          onClick={loadRampCorridors}
-          disabled={rampCorridorsStatus === "loading"}
-        >
-          {rampCorridorsStatus === "loading" ? "Checking…" : "Re-check corridors"}
-        </button>
-      </div>
+  const recheck = (
+    <button
+      type="button"
+      className="btn btn-ghost btn-sm"
+      onClick={loadRampCorridors}
+      disabled={rampCorridorsStatus === "loading"}
+    >
+      {rampCorridorsStatus === "loading" ? "Checking…" : "Re-check corridors"}
+    </button>
+  );
 
+  // `bare` gives the same content without its own card, so a parent can fold it
+  // into a disclosure rather than nesting a card inside a card.
+  const content = (
+    <>
+      {bare ? <div className="section-actions">{recheck}</div> : null}
       <div className="note note-info tiny">{CORRIDOR_IN_ONE_LINE}</div>
 
       <div className="field">
@@ -145,7 +168,8 @@ export function CorridorPanel() {
             );
           }}
         >
-          {copied ? "Address copied ✓" : "Copy my address"}
+          {copied ? <IconCheck size={15} /> : <IconCopy size={15} />}
+          {copied ? "Address copied" : "Copy my address"}
         </button>
       </div>
 
@@ -207,7 +231,7 @@ export function CorridorPanel() {
                       className="member-avatar"
                       style={{ background: quote.recommended ? "var(--yellow-dark)" : "var(--muted-2)" }}
                     >
-                      {quote.recommended ? "★" : "·"}
+                      {quote.recommended ? <IconSpark size={16} /> : "·"}
                     </div>
                     <div>
                       <div className="member-name">
@@ -266,6 +290,18 @@ export function CorridorPanel() {
         holding zero XLM can contribute only while that sponsorship is on — which is exactly the
         setting a real deployment needs.
       </p>
+    </>
+  );
+
+  if (bare) return content;
+
+  return (
+    <div className="card">
+      <div className="card-head">
+        <span className="card-title">Money in and out</span>
+        {recheck}
+      </div>
+      {content}
     </div>
   );
 }

@@ -458,41 +458,59 @@
   border-color: rgba(74, 84, 225, 0.28);
 }
 
-/* ============================ Right rail ============================ */
+/* ============================ Top bar menu ============================ */
 
-.rail {
-  position: fixed;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 40;
+.menu {
+  position: relative;
 }
 
-.rail-btn {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+.menu-pop {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 212px;
   background: #fff;
-  border: 1px solid var(--hairline-2);
-  box-shadow: var(--sh-rail);
+  border: 1px solid var(--hairline);
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(60, 40, 10, 0.16);
+  padding: 6px;
+  display: grid;
+  gap: 2px;
+  z-index: 70;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: none;
+  border: 0;
+  border-radius: 11px;
+  padding: 10px 11px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+}
+
+.menu-item:hover {
+  background: var(--cream-2);
+}
+
+.menu-item.is-danger {
+  color: var(--red-dark);
+}
+
+.menu-icon {
   display: grid;
   place-items: center;
-  cursor: pointer;
-  font-size: 19px;
-  transition: transform 0.1s ease, border-color 0.15s ease;
+  color: var(--muted);
 }
 
-.rail-btn:hover {
-  transform: scale(1.06);
-  border-color: var(--yellow-dark);
-}
-
-.rail-btn[aria-current="true"] {
-  border-color: var(--indigo);
-  box-shadow: 0 0 0 2px rgba(74, 84, 225, 0.18), var(--sh-rail);
+.menu-item.is-danger .menu-icon {
+  color: var(--red-dark);
 }
 
 /* ============================ Decor ============================ */
@@ -761,11 +779,180 @@
   max-width: 440px;
 }
 
+/* ============================ Disclosure sections ============================ */
+
+/* A collapsed card should read as one quiet row, not a full card of air. */
+.card.section {
+  padding: 0;
+  overflow: hidden;
+}
+
+.section-head {
+  width: 100%;
+  background: none;
+  border: 0;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.section-head:hover {
+  background: rgba(0, 0, 0, 0.015);
+}
+
+.section-labels {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.section-summary {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted-2);
+}
+
+.section-chevron {
+  flex: none;
+  color: var(--muted-2);
+  transition: transform 0.18s ease;
+}
+
+.section-chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.section-body {
+  padding: 0 18px 18px;
+}
+
+.section-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+/* ============================ Stat strip ============================ */
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.stat {
+  background: #fff;
+  border: 1px solid var(--hairline-2);
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 3px;
+  box-shadow: var(--sh-card);
+}
+
+.stat-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.stat strong {
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================ Small helpers ============================ */
+
+.cta-wrap {
+  flex-direction: row;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.icon-btn {
+  padding: 7px 9px;
+}
+
+.account-btn {
+  gap: 7px;
+}
+
+.network-chip {
+  padding: 7px 14px;
+}
+
+.stage-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.footer-links a,
+.soc-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.soc-text:hover,
+.footer-links a:hover {
+  color: var(--ink);
+}
+
+.soc {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+
+/* The one action that matters, at thumb height, on a phone only. */
+.mobile-cta {
+  display: none;
+}
+
 /* ============================ Responsive ============================ */
 
-@media (max-width: 1120px) {
-  .rail {
+@media (max-width: 760px) {
+  .mobile-cta {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 10px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+    background: linear-gradient(180deg, rgba(250, 246, 239, 0.72), var(--cream) 42%);
+    backdrop-filter: blur(6px);
+    border-top: 1px solid var(--hairline);
+    z-index: 60;
+  }
+
+  .shell {
+    padding-bottom: 106px;
+  }
+
+  .menu-trigger-label,
+  .network-chip {
     display: none;
+  }
+
+  .hero-sub {
+    font-size: 14px;
   }
 }
 
@@ -782,19 +969,29 @@
     grid-template-columns: 1fr;
   }
 
+  /* Brand and the account controls share the first row; the countdown drops
+     underneath it rather than shoving the controls onto a line of their own. */
   .topbar {
     grid-template-columns: 1fr auto;
+    row-gap: 12px;
+    margin-bottom: 26px;
   }
 
-  .countdown {
+  .topbar-right {
+    grid-row: 1;
+    grid-column: 2;
+  }
+
+  .topbar-center {
+    grid-row: 2;
     grid-column: 1 / -1;
-    justify-content: center;
+    justify-self: center;
   }
 }
 
 @media (max-width: 560px) {
   .shell {
-    padding: 16px 14px 72px;
+    padding: 16px 14px 116px;
   }
 
   .display {
@@ -802,7 +999,48 @@
   }
 
   .stage {
-    min-height: 220px;
+    min-height: 200px;
     gap: 12px;
+  }
+
+  .stat-row {
+    gap: 8px;
+  }
+
+  .stat {
+    padding: 10px 11px;
+  }
+
+  .stat strong {
+    font-size: 15px;
+  }
+
+  .card {
+    padding: 18px;
+  }
+
+  .card.section {
+    padding: 0;
+  }
+
+  .section-head {
+    padding: 15px 16px;
+  }
+
+  .section-body {
+    padding: 0 16px 16px;
+  }
+
+  /* Props are decoration; below this width they only push the CTA off-screen. */
+  .stage-row {
+    justify-content: center;
+  }
+
+  .proof {
+    grid-template-columns: 1fr;
+  }
+
+  .proof-vs {
+    display: none;
   }
 }

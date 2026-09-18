@@ -16,6 +16,8 @@ import { fmtUsdcDisplay, shortAddr } from "../lib/format";
 import { usePollar } from "../lib/pollar";
 import { circleShareUrl } from "../lib/share";
 import { upsertCircle } from "../lib/store";
+import { IconPlus } from "../components/icons";
+import { Disclosure } from "../components/Disclosure";
 
 interface DraftMember {
   key: string;
@@ -266,20 +268,29 @@ export function CreateCircle() {
           ))}
         </div>
 
-        <div className="grid-3">
-          <div className="lcd">
-            <div className="lcd-label">Round payout</div>
-            <div className="lcd-value">${fmtUsdcDisplay(preview.round)}</div>
+        {/* The numbers matter, but they should not stand between the form and
+            the button. Collapsed, they are one line; opened, the full LCDs. */}
+        <Disclosure
+          title="What this circle moves"
+          summary={`$${fmtUsdcDisplay(preview.round)} a round · $${fmtUsdcDisplay(
+            preview.lifetime
+          )} over ${members.length} rounds · ${preview.perYear} payments each per year`}
+        >
+          <div className="grid-3">
+            <div className="lcd">
+              <div className="lcd-label">Round payout</div>
+              <div className="lcd-value">${fmtUsdcDisplay(preview.round)}</div>
+            </div>
+            <div className="lcd">
+              <div className="lcd-label">Moved over {members.length} rounds</div>
+              <div className="lcd-value">${fmtUsdcDisplay(preview.lifetime)}</div>
+            </div>
+            <div className="lcd">
+              <div className="lcd-label">Payments / member / year</div>
+              <div className="lcd-value">{preview.perYear}</div>
+            </div>
           </div>
-          <div className="lcd">
-            <div className="lcd-label">Moved over {members.length} rounds</div>
-            <div className="lcd-value">${fmtUsdcDisplay(preview.lifetime)}</div>
-          </div>
-          <div className="lcd">
-            <div className="lcd-label">Payments / member / year</div>
-            <div className="lcd-value">{preview.perYear}</div>
-          </div>
-        </div>
+        </Disclosure>
 
         {error ? <div className="note note-bad">{error}</div> : null}
         {!hasKey ? (
@@ -290,7 +301,7 @@ export function CreateCircle() {
         ) : null}
 
         <button type="button" className="btn btn-primary btn-block" onClick={submit}>
-          🧰 Create the circle
+          <IconPlus size={18} /> Create the circle
         </button>
       </div>
     </div>

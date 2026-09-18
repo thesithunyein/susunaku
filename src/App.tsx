@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActionRail, CountdownPill, Decor, Footer, TopBar, railIcons } from "./components/chrome";
+import { CountdownPill, Decor, Footer, TopBar, TopBarMenu, type MenuItem } from "./components/chrome";
 import { SignInPanel } from "./components/AuthPanel";
 import { Home } from "./pages/Home";
 import { CreateCircle } from "./pages/CreateCircle";
 import { JoinCircle } from "./pages/JoinCircle";
 import { HowItWorks, Setup } from "./pages/Info";
+import { IconBook, IconClose, IconClock, IconKey, IconPlus, IconRefresh, IconUser } from "./components/icons";
 import { currentRound, isComplete, roundWindow } from "./lib/circle";
 import { NETWORK } from "./lib/config";
 import { fmtCountdown, shortAddr } from "./lib/format";
@@ -55,6 +56,16 @@ export default function App() {
 
   const openAuth = useCallback(() => setAuthOpen(true), []);
 
+  // Close the sheet on Escape, like every other modal.
+  useEffect(() => {
+    if (!authOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setAuthOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [authOpen]);
+
   const activeCircle = useMemo(() => {
     if (route.name !== "home") return undefined;
     return route.circleId ? circles.find((c) => c.id === route.circleId) : circles[0];
@@ -74,80 +85,76 @@ export default function App() {
     const finished = isComplete(activeCircle, now);
     return (
       <CountdownPill>
-        <span aria-hidden="true">⏳</span>
-        <span className="cd-label">This Round Ends In:</span>{" "}
+        <IconClock size={14} />
+        <span className="cd-label">Ends in</span>{" "}
         <strong>{finished ? "closed" : fmtCountdown(left)}</strong>
       </CountdownPill>
     );
   }, [activeCircle, now]);
 
-  const icons = railIcons();
-
-  const jump = (id: string) =>
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-
-  const rail = [
-    { id: "members", title: "Round members", icon: icons.members, onClick: () => jump("members") },
-    { id: "receipts", title: "Receipts", icon: icons.receipts, onClick: () => jump("receipts") },
-    {
-      id: "wallet",
-      title: "Connect Pollar / wallet",
-      icon: icons.bolt,
-      onClick: openAuth,
-    },
+  const menu: MenuItem[] = [
     {
       id: "new",
-      title: "New circle",
-      icon: icons.star,
+      label: "New circle",
+      icon: <IconPlus size={16} />,
       onClick: () => (window.location.hash = "#/new"),
     },
     {
       id: "how",
-      title: "How it works",
-      icon: icons.heart,
+      label: "How it works",
+      icon: <IconBook size={16} />,
       onClick: () => (window.location.hash = "#/how"),
     },
     {
       id: "setup",
-      title: "Network & key",
-      icon: icons.printer,
+      label: "Network & key",
+      icon: <IconKey size={16} />,
       onClick: () => (window.location.hash = "#/setup"),
     },
-    {
-      id: "balance",
-      title: "Refresh balance",
-      icon: icons.coin,
-      onClick: () => pollar.refreshBalance(),
-    },
   ];
+  if (pollar.hasKey) {
+    menu.push({
+      id: "balance",
+      label: "Refresh balance",
+      icon: <IconRefresh size={16} />,
+      onClick: () => pollar.refreshBalance(),
+    });
+  }
+  if (pollar.address) {
+    menu.push({
+      id: "signout",
+      label: "Sign out",
+      icon: <IconUser size={16} />,
+      danger: true,
+      onClick: () => pollar.signOut(),
+    });
+  }
 
   return (
     <div className="shell">
       <Decor />
-      <ActionRail
-        actions={rail.map((action) => ({
-          ...action,
-          current: route.name === action.id,
-        }))}
-      />
 
       <div className="wrap">
         <TopBar
           pill={pill}
           right={
             <>
-              <span className="countdown">
+              <span className="countdown network-chip">
                 <span className="cd-label">Stellar</span>{" "}
                 <strong>{NETWORK === "mainnet" ? "mainnet" : "testnet"}</strong>
               </span>
               <button
                 type="button"
-                className="btn btn-ghost btn-sm"
+                className="btn btn-ghost btn-sm account-btn"
                 onClick={openAuth}
                 title={pollar.address ?? "Sign in"}
               >
-                {pollar.address ? `👤 ${shortAddr(pollar.address)}` : "👤 Sign in"}
+                <IconUser size={16} />
+                <span className="account-label">
+                  {pollar.address ? shortAddr(pollar.address, 3) : "Sign in"}
+                </span>
               </button>
+              <TopBarMenu items={menu} />
             </>
           }
         />
@@ -168,27 +175,28 @@ export default function App() {
           className="modal-backdrop"
           role="dialog"
           aria-modal="true"
-          aria-label="Sign in"
+          aria-label="Your wallet"
           onClick={(event) => {
             if (event.target === event.currentTarget) setAuthOpen(false);
           }}
         >
           <div className="modal">
             <div className="card-head">
-              <span className="card-title">Your wallet, in one tap</span>
+              <span className="card-title">Your wallet</span>
               <button
                 type="button"
-                className="btn btn-ghost btn-sm"
+                className="btn btn-ghost btn-sm icon-btn"
                 onClick={() => setAuthOpen(false)}
+                aria-label="Close"
               >
-                Close
+                <IconClose size={16} />
               </button>
             </div>
             <SignInPanel />
             <p className="tiny muted" style={{ marginBottom: 0 }}>
-              No seed phrase and no browser extension: Pollar creates a Stellar wallet for you
-              and sponsors the wallet itself. Stellar's network fee still comes from your own
-              XLM — about a hundredth of a cent per payment.
+              No seed phrase and no browser extension: Pollar creates a Stellar wallet for you and
+              sponsors the wallet itself. Stellar's network fee still comes from your own XLM —
+              about a hundredth of a cent per payment.
             </p>
           </div>
         </div>
