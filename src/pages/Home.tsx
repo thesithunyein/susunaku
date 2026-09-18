@@ -92,7 +92,9 @@ function ProductIntro() {
 
       <div className="card">
         <div className="card-head">
-          <span className="card-title">{t("table.title")}</span>
+          <span className="card-title" style={{ textTransform: "none", letterSpacing: 0, fontSize: 17 }}>
+            {t("table.title")}
+          </span>
         </div>
         <div className="compare">
           <div className="compare-row compare-head">
