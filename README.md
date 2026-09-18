@@ -57,6 +57,7 @@ Requires Node 20+.
 
 ```bash
 npm install
+cp .env.example .env.local     # optional: bake in your key and network
 npm run dev                    # http://localhost:5187
 ```
 
