@@ -102,18 +102,38 @@ because contributions are irreversible.
 
 ## Deploy
 
+Live at **https://susunaku.sithunyein.com** — Vercel project `susunaku`, source at
+[github.com/thesithunyein/susunaku](https://github.com/thesithunyein/susunaku).
+
 The build is a static bundle, so any static host works.
 
-**Vercel**
+**Vercel** (what production uses)
 
 ```bash
-npm run build
-npx vercel --prod
+vercel link --project susunaku   # first time only
+vercel --prod
 ```
 
-Then add the domain: Vercel → Project → Settings → Domains → `susunaku.sithunyein.com`. At your
-DNS provider add the record Vercel shows you (usually `CNAME susunaku → cname.vercel-dns.com`),
-wait for the certificate, and add `https://susunaku.sithunyein.com` to Pollar's allowed domains.
+The domain is already attached to the project and `sithunyein.com` is on Vercel's own
+nameservers, so DNS and TLS are automatic — every `vercel --prod` republishes the live URL.
+No manual CNAME step is needed.
+
+### Connecting Pollar
+
+Use a **publishable** key from [dashboard.pollar.xyz](https://dashboard.pollar.xyz) → Build →
+API Keys. Bake it into the build, or paste it into the running app (kept in that browser only):
+
+```bash
+vercel env add VITE_POLLAR_PUBLISHABLE_KEY production   # pub_testnet_... or pub_mainnet_...
+vercel env add VITE_STELLAR_NETWORK production          # testnet | mainnet
+vercel --prod
+```
+
+Two gotchas worth knowing before you debug:
+
+- A `pat_...` personal access token is **not** usable here. Pollar's API answers
+  `API_KEY_TYPE_NOT_ALLOWED` for client endpoints — only `pub_...` keys are accepted.
+- Add `https://susunaku.sithunyein.com` to the app's allowed domains in the Pollar dashboard.
 
 **Static hosts that read a `CNAME` file** (GitHub Pages, Cloudflare Pages) already have
 `public/CNAME` set to `susunaku.sithunyein.com`.

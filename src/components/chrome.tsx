@@ -110,7 +110,13 @@ export function Footer() {
         </a>
       </span>
       <span className="footer-right">
-        <a className="soc" href="https://github.com" target="_blank" rel="noreferrer" aria-label="GitHub">
+        <a
+          className="soc"
+          href="https://github.com/thesithunyein/susunaku"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="GitHub"
+        >
           🐙
         </a>
         <a
