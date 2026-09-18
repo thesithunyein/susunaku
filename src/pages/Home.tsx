@@ -122,7 +122,7 @@ export function Home({
   if (!circle) {
     return (
       <>
-        <section className="hero">
+        <section className="hero hero-empty">
           <div className="kicker">No circle on this device</div>
           <h1 className="display display-sm">No circles yet</h1>
           <p className="hero-sub">

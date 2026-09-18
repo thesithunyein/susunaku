@@ -206,6 +206,26 @@
   padding: 9vh 0 4vh;
 }
 
+/* Two actions are two separate decisions, so they get air between them rather
+   than stacking flush. The decorative arrow under a blank page says nothing. */
+.hero-empty .cta-row {
+  gap: 12px;
+}
+
+.hero-empty .marker {
+  display: none;
+}
+
+@media (min-width: 760px) {
+  .hero-empty .cta-row {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+}
+
 .kicker {
   font-size: 16px;
   font-weight: 600;
@@ -246,7 +266,7 @@
 }
 
 .display-sm {
-  font-size: clamp(38px, 6vw, 74px);
+  font-size: clamp(42px, 6vw, 74px);
 }
 
 .hero-sub {
@@ -1086,7 +1106,10 @@
     padding: 16px 14px 116px;
   }
 
-  .display {
+  /* Scoped, so a deliberately smaller heading survives on a phone. Unscoped, this
+     rule beat .display-sm everywhere and made "NO CIRCLES YET" 66px on a 423px
+     screen. */
+  .display:not(.display-sm) {
     font-size: clamp(52px, 15vw, 92px);
   }
 
